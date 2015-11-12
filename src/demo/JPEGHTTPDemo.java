@@ -1,7 +1,7 @@
-package skeleton.demo;
+package demo;
 
-import skeleton.server.JPEGHTTPServer;
-import skeleton.client.JPEGHTTPClient;
+import client.JPEGHTTPClient;
+import server.JPEGHTTPServer;
 
 public class JPEGHTTPDemo {
 
