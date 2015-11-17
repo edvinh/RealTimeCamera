@@ -1,5 +1,9 @@
 package client;
 
-public class ClientGUI{
+// Pax Robin 
+public class ClientGUI {
 
+	// ge dig för fan !
+ // odhifsodgijsåodghsds
+	// sdghpsoidgh¨sdog
 }
