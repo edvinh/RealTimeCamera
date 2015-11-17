@@ -1,9 +1,15 @@
 package client;
 
-// Pax Robin 
-public class ClientGUI {
+import javax.swing.JFrame;
 
-	// ge dig för fan !
- // odhifsodgijsåodghsds
-	// sdghpsoidgh¨sdog
+// Pax Robin 
+public class ClientGUI extends JFrame {
+	
+	private static final long serialVersionUID = 1L;
+
+	public ClientGUI() {
+		super();
+		
+	}
+	
 }
