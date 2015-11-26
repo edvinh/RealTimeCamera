@@ -22,8 +22,9 @@ public class JPEGHTTPServer {
 
 	// ----------------------------------------------------------- MAIN PROGRAM
 
-	public static void main(String[]args) {
-		JPEGHTTPServer theServer = new JPEGHTTPServer(Integer.parseInt(args[0]));
+	public static void main(String[] args) {
+		//JPEGHTTPServer theServer = new JPEGHTTPServer(Integer.parseInt(args[0]));
+		JPEGHTTPServer theServer = new JPEGHTTPServer(3001);
 		try {
 			theServer.handleRequests();
 		} catch(IOException e) {

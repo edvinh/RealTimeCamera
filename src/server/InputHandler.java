@@ -1,5 +1,5 @@
 package server;
 
-public class InputHandler extends Thread{
+public class InputHandler extends Thread {
 
 }

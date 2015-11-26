@@ -16,11 +16,12 @@ import javax.swing.JPanel;
 public class ClientGUI extends JFrame {
 	private int height, width;
 	public static final String TITLE = "Real-Time Camera System";
-
+	private ClientMonitor mon;
 	private static final long serialVersionUID = 1L;
 
-	public ClientGUI() {
+	public ClientGUI(ClientMonitor mon) {
 		super();
+		this.mon = mon;
 		this.setTitle(TITLE);
 		this.setLayout(new BorderLayout());
 		

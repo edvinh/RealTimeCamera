@@ -9,15 +9,17 @@ import java.net.UnknownHostException;
 public class ClientSocketConnection extends Thread {
 	InputStream is;
 	OutputStream os;
-
+	private ClientMonitor monitor;
+	
 	// Creates a socket connection and sends an arbitrary byte array
-	public ClientSocketConnection() throws UnknownHostException, IOException {
-		Socket s = new Socket("argus-7.student.lth.se", 6667);
+	public ClientSocketConnection(ClientMonitor monitor, String proxy, int port) throws UnknownHostException, IOException {
+		//Socket s = new Socket("argus-7.student.lth.se", 6667);
+		Socket s = new Socket(proxy, port);
 		s.setTcpNoDelay(true);
 		is = s.getInputStream();
 		os = s.getOutputStream();
 		byte[] data = new byte[100];
-		os.write(data, 0, 100);
+		//os.write(data, 0, 100);
 	}
 
 	// Reads the contents of data, one byte at a time.
