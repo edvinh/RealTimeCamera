@@ -16,6 +16,10 @@ public class ServerMonitor {
 		notifyAll();
 	}
 	
+	public synchronized byte[] getImageData() {
+		return imageData;
+	}
+	
 	public boolean hasNewImage() {
 		if (newImage) {
 			newImage = false;
