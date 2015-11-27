@@ -67,7 +67,7 @@ class GUI extends JFrame {
 		super();
 		this.server = server;
 		this.port = port;
-		imagePanel = new ImagePanel();
+		//imagePanel = new ImagePanel();
 		button = new JButton("Get image");
 		button.addActionListener(new ButtonHandler(this));
 		this.getContentPane().setLayout(new BorderLayout());

@@ -1,11 +1,13 @@
 package client;
 
+import se.lth.cs.eda040.fakecamera.AxisM3006V;
+
 public class ClientMonitor {
 	private byte[] imageData;
 	private boolean newImage;
 	
 	public ClientMonitor() {
-		imageData = new byte[100];
+		imageData = new byte[AxisM3006V.IMAGE_BUFFER_SIZE];
 		newImage = false;
 	}
 	
@@ -19,7 +21,15 @@ public class ClientMonitor {
 		notifyAll();
 	}
 	
+	/**
+	 * Returns true once if there is a new image. Will only work with one socket connection. TODO FIX 
+	 * @return
+	 */
 	public synchronized boolean hasNewImage() {
-		return newImage;
+		if (newImage) {
+			newImage = false;
+			return true;
+		}
+		return false;
 	}
 }

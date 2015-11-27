@@ -6,34 +6,26 @@ import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import se.lth.cs.eda040.fakecamera.AxisM3006V;
+
 public class ServerSocketConnection extends Thread {
 	InputStream is;
 	OutputStream os;
-
-	// Creates a socket connection, accepts, reads the arbitrary byte array and
-	// responds with 1.
-	public ServerSocketConnection() throws IOException {
-		ServerSocket ss = new ServerSocket(6667);
+	
+	
+	public ServerSocketConnection(int port, String address) throws IOException {
+		ServerSocket ss = new ServerSocket(port);
 		Socket s = ss.accept();
 		s.setTcpNoDelay(true);
 		is = s.getInputStream();
 		os = s.getOutputStream();
-		byte[] data = new byte[100];
-		int read = 0;
-		while (read < 100) {
-			int n = is.read(data, read, 100 - read); // Blocking
-			if (n == -1)
-				throw new IOException();
-			read += n;
-		}
-		os.write(1);
 	}
 
 	// Reads the contents of data, one byte at a time.
 	public void read(byte[] data) throws IOException {
 		int read = 0;
-		while (read < 100) {
-			int n = is.read(data, read, 100 - read); // Blocking
+		while (read < AxisM3006V.IMAGE_BUFFER_SIZE) {
+			int n = is.read(data, read, AxisM3006V.IMAGE_BUFFER_SIZE - read); // Blocking
 			if (n == -1)
 				throw new IOException();
 			read += n;
@@ -42,7 +34,6 @@ public class ServerSocketConnection extends Thread {
 
 	// Writes data to the Output Stream
 	public void write(byte[] data) throws IOException {
-		os.write(data, 0, 100);
+		os.write(data, 0, AxisM3006V.IMAGE_BUFFER_SIZE);
 	}
-
 }

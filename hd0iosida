@@ -1,0 +1,41 @@
+[33mcommit 5eb5f18448871e3aec9916f4f795d97afecbfbec[m
+Author: Robin Timan <Robin Timan>
+Date:   Wed Nov 18 02:31:54 2015 +0100
+
+    GUI shows a picture of Edvin
+
+[33mcommit 771df65b4cbc8e180da324e0b72f98273e074c9b[m
+Author: Max Lindblom <max.g.lindblom@gmail.com>
+Date:   Tue Nov 17 17:20:22 2015 +0100
+
+    Added logic to ServerConnection classes
+
+[33mcommit e799bfbe8de7d8fc653f044b5e04dc8ad0a0aab5[m
+Author: Robin Timan <Robin Timan>
+Date:   Tue Nov 17 16:50:13 2015 +0100
+
+    La till main-metod
+
+[33mcommit 711a19e30c44387a27a88982c471e394d299e8b2[m
+Author: Robin Timan <Robin Timan>
+Date:   Tue Nov 17 15:55:04 2015 +0100
+
+    testa commit
+
+[33mcommit e0fffa4aa2c2b4bcc4a379df407e18ccd5cacd32[m
+Author: Martin Johansson <dat13mjo@panter-7.student.lth.se>
+Date:   Thu Nov 12 09:14:50 2015 +0100
+
+    All relevant classes added
+
+[33mcommit 2c2efcc7f90619c00423207b86c7505774ee6b5e[m
+Author: Martin Johansson <dat13mjo@panter-7.student.lth.se>
+Date:   Thu Nov 12 08:56:15 2015 +0100
+
+    HEJSAN
+
+[33mcommit 670a1f3e059f03af8fe6adbe4d0cb932c4064259[m
+Author: Edvin Havic <edvin.havic@lunicore.se>
+Date:   Thu Nov 5 09:12:18 2015 +0100
+
+    initial commit
