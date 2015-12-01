@@ -1,10 +1,12 @@
 package client;
 
 import java.awt.BorderLayout;
+import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.Image;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
@@ -30,8 +32,8 @@ public class ClientGUI extends JFrame {
 		this.monitor = monitor;
 		this.setTitle(TITLE);
 		this.setLayout(new BorderLayout());
-
-		this.add(new ImagePanel(monitor), BorderLayout.NORTH);
+		ImagePanel imagePanel = new ImagePanel(monitor);
+		this.add(imagePanel, BorderLayout.NORTH);
 
 		// Buttons for IDLE and MOVIE
 		JRadioButton idle = new JRadioButton("Idle", true);
@@ -44,8 +46,8 @@ public class ClientGUI extends JFrame {
 		modes.add(movie);
 
 		// Buttons for synchronized and asynchronized
-		JRadioButton sync = new JRadioButton("Synchronized", true);
-		JRadioButton async = new JRadioButton("Asynchronized", false);
+		JRadioButton sync = new JRadioButton("Synchronous", true);
+		JRadioButton async = new JRadioButton("Asynchronous", false);
 		ButtonGroup syncSet = new ButtonGroup();
 		syncSet.add(sync);
 		syncSet.add(async);
@@ -69,6 +71,7 @@ public class ClientGUI extends JFrame {
 		this.setVisible(true);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.pack();
+		imagePanel.start();
 	}
 
 }
@@ -79,22 +82,36 @@ class ImagePanel extends JPanel {
 	ClientMonitor monitor;
 	Logger log = Logger.getInstance();
 
-	ImagePanel(final ClientMonitor monitor) {
+	ImagePanel(ClientMonitor monitor) {
 		super();
 		this.monitor = monitor;
 		icon = new ImageIcon();
 		JLabel label = new JLabel(icon);
 		add(label, BorderLayout.NORTH);
 		this.setSize(200, 200);
-
+	}
+	
+	public void start() {
+		System.out.println("started image panel");
+		while (true) {
+			refresh(monitor.getImageData());
+			// Robin löser detta med sina s.k. DANK SKILLS 
+			try { Thread.sleep(30L); } catch (Exception e) {}
+		}
 	}
 
 	void refresh(final byte[] data) {
 		if (data == null) {
-			log.debug("ClientGUI - received null image");
+			System.out.println("ClientGUI - received null image");
 			return;
 		}
-		final JPanel self = this;
+		
+		Image theImage = getToolkit().createImage(data);
+		getToolkit().prepareImage(theImage, -1, -1, null);
+		icon.setImage(theImage);
+		icon.paintIcon(this, this.getGraphics(), 5, 5);
+		
+		/*final JPanel self = this;
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
@@ -104,7 +121,7 @@ class ImagePanel extends JPanel {
 				icon.paintIcon(self, self.getGraphics(), 5, 5);
 			}
 
-		});
+		});*/
 	}
 }
 

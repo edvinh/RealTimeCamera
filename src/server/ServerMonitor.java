@@ -5,8 +5,9 @@ import se.lth.cs.eda040.fakecamera.AxisM3006V;
 public class ServerMonitor {
 	
 	private byte[] imageData;
-	private boolean newImage = false;
+	private boolean newImage;
 	public ServerMonitor() {
+		newImage = false;
 		imageData = new byte[AxisM3006V.IMAGE_BUFFER_SIZE];
 	}
 	

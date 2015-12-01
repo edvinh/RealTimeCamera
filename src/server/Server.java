@@ -9,14 +9,10 @@ public class Server {
 	public static void main(String[] args) {
 		Logger log = Logger.getInstance();
 		
-		// Setup Camera
-		AxisM3006V camera = new AxisM3006V();
-		camera.init();
-		camera.setProxy("argus-1.student.lth.se", 6667);
 		
 		ServerSocketConnection socket = null;
 		ServerMonitor monitor = new ServerMonitor();
-		new PollingThread(50, camera, monitor).start();
+		new CameraCaptureThread("argus-1.student.lth.se", 6667, monitor).start();
 		try {
 			// Start server socket
 			socket = new ServerSocketConnection(3001, monitor);
@@ -28,9 +24,7 @@ public class Server {
 			e.printStackTrace();
 		}
 		
-		// Send data when available, busy wait... TODO change
 		System.out.println("Server listening...");
 		
-		// TODO Start sending camera stuff with ServerSocketConnection and PollingThread
 	}
 }

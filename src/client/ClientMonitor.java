@@ -17,10 +17,6 @@ public class ClientMonitor {
 	}
 	
 	public synchronized void setImageData(byte[] data) {
-		for (int i = 0; i < 10; i++) {
-			System.out.print(data[i] + " ");
-		}
-		System.out.println();
 		imageData = data;
 		newImage = true;
 		notifyAll();
