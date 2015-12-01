@@ -56,7 +56,7 @@ public class PollingThread extends Thread {
 
 				
 				monitor.setImageData(image);
-				notifyAll();
+				//notifyAll();
 			}
 			oldTime = System.currentTimeMillis();
 		}

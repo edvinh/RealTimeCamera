@@ -21,10 +21,11 @@ public class ServerMonitor {
 	}
 	
 	public boolean hasNewImage() {
-		if (newImage) {
+		/*if (newImage) {
 			newImage = false;
 			return true;
 		}
-		return false;
+		return false;*/
+		return newImage;
 	}
 }

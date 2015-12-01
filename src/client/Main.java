@@ -15,6 +15,7 @@ public class Main {
 		String address = "localhost";
 		try {
 			ClientSocketConnection socket = new ClientSocketConnection(monitor, address, port);
+			socket.start();
 		} catch (IOException e) {
 			log.error("Could not connect to server socket!");
 			e.printStackTrace();

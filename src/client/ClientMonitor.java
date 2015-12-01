@@ -12,10 +12,15 @@ public class ClientMonitor {
 	}
 	
 	public synchronized byte[] getImageData() {
+		newImage = false;
 		return imageData;
 	}
 	
 	public synchronized void setImageData(byte[] data) {
+		for (int i = 0; i < 10; i++) {
+			System.out.print(data[i] + " ");
+		}
+		System.out.println();
 		imageData = data;
 		newImage = true;
 		notifyAll();
@@ -26,10 +31,6 @@ public class ClientMonitor {
 	 * @return
 	 */
 	public synchronized boolean hasNewImage() {
-		if (newImage) {
-			newImage = false;
-			return true;
-		}
-		return false;
+		return newImage;
 	}
 }

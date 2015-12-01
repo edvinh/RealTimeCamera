@@ -8,32 +8,29 @@ import util.Logger;
 public class Server {
 	public static void main(String[] args) {
 		Logger log = Logger.getInstance();
-		int port = 6667;
-		String address = "argus-1.student.lth.se";
+		
+		// Setup Camera
 		AxisM3006V camera = new AxisM3006V();
 		camera.init();
-		camera.setProxy(address, port);
+		camera.setProxy("argus-1.student.lth.se", 6667);
+		
 		ServerSocketConnection socket = null;
 		ServerMonitor monitor = new ServerMonitor();
+		new PollingThread(50, camera, monitor).start();
 		try {
 			// Start server socket
-			socket = new ServerSocketConnection(3001, "localhost");
+			socket = new ServerSocketConnection(3001, monitor);
+			//InputHandler inputHandler = new InputHandler(socket);
+			socket.start();
+			//inputHandler.start();
 		} catch (IOException e) {
 			log.error("Server Socket - cannot connect to camera");
 			e.printStackTrace();
 		}
 		
 		// Send data when available, busy wait... TODO change
-		while (true) {
-			if (monitor.hasNewImage()) {
-				try {
-					socket.write(monitor.getImageData());
-				} catch (IOException e) {
-					log.error("Server Socket IO Exception when writing to output stream");
-					e.printStackTrace();
-				}
-			}
-		}
+		System.out.println("Server listening...");
+		
 		// TODO Start sending camera stuff with ServerSocketConnection and PollingThread
 	}
 }

@@ -14,7 +14,6 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.SwingUtilities;
 
-import server.PollingThread;
 import util.Logger;
 
 // Pax Robin 
@@ -33,7 +32,7 @@ public class ClientGUI extends JFrame {
 		this.setLayout(new BorderLayout());
 
 		this.add(new ImagePanel(monitor), BorderLayout.NORTH);
-		
+
 		// Buttons for IDLE and MOVIE
 		JRadioButton idle = new JRadioButton("Idle", true);
 		JRadioButton movie = new JRadioButton("Movie", false);
@@ -79,45 +78,39 @@ class ImagePanel extends JPanel {
 	ImageIcon icon;
 	ClientMonitor monitor;
 	Logger log = Logger.getInstance();
+
 	ImagePanel(final ClientMonitor monitor) {
 		super();
 		this.monitor = monitor;
 		icon = new ImageIcon();
-		// Image edvin = null;
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				refresh(monitor.getImageData());
-			}
-		});
-
-		/*
-		 * try { URL url = new URL(
-		 * "https://scontent-arn2-1.xx.fbcdn.net/hphotos-prn2/t31.0-8/10945063_10152636074767966_1813533636179366365_o.jpg"
-		 * ); edvin = ImageIO.read(url); } catch (Exception e) {
-		 * e.printStackTrace(); }
-		 */
-		// icon.setImage(edvin);
 		JLabel label = new JLabel(icon);
 		add(label, BorderLayout.NORTH);
 		this.setSize(200, 200);
 
 	}
 
-	void refresh(byte[] data) {
+	void refresh(final byte[] data) {
 		if (data == null) {
 			log.debug("ClientGUI - received null image");
 			return;
 		}
-		Image theImage = getToolkit().createImage(data);
-		getToolkit().prepareImage(theImage, -1, -1, null);
-		icon.setImage(theImage);
-		icon.paintIcon(this, this.getGraphics(), 5, 5);
+		final JPanel self = this;
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				Image theImage = getToolkit().createImage(data);
+				getToolkit().prepareImage(theImage, -1, -1, null);
+				icon.setImage(theImage);
+				icon.paintIcon(self, self.getGraphics(), 5, 5);
+			}
+
+		});
 	}
 }
 
 class IdleAndMovieHandler implements ItemListener {
 	private ClientMonitor mon;
-	
+
 	IdleAndMovieHandler(ClientMonitor mon) {
 		this.mon = mon;
 	}
@@ -126,10 +119,10 @@ class IdleAndMovieHandler implements ItemListener {
 	public void itemStateChanged(ItemEvent event) {
 		JRadioButton pressed = (JRadioButton) event.getSource();
 		if (pressed.getText().equals("Movie")) {
-			// Update period 
+			// Update period
 		} else {
 			// Update period
 		}
-			
-	}	
+
+	}
 }

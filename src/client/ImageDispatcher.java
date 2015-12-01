@@ -1,5 +1,5 @@
 package client;
 
-public class ImageDispatcher extends Thread{
+public class ImageDispatcher extends Thread {
 
 }
