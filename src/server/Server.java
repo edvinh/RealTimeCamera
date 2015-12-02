@@ -2,12 +2,8 @@ package server;
 
 import java.io.IOException;
 
-import se.lth.cs.eda040.fakecamera.AxisM3006V;
-import util.Logger;
-
 public class Server {
 	public static void main(String[] args) {
-		Logger log = Logger.getInstance();
 		
 		
 		ServerSocketConnection socket = null;
@@ -20,7 +16,7 @@ public class Server {
 			socket.start();
 			//inputHandler.start();
 		} catch (IOException e) {
-			log.error("Server Socket - cannot connect to camera");
+			System.err.println("Server connection failure");
 			e.printStackTrace();
 		}
 		

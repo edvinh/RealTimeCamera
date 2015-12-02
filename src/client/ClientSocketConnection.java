@@ -6,8 +6,8 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-import client.Command.CMD;
 import se.lth.cs.eda040.fakecamera.AxisM3006V;
+import util.Command.CMD;
 
 public class ClientSocketConnection extends Thread {
 	InputStream is;
@@ -59,13 +59,13 @@ public class ClientSocketConnection extends Thread {
 	
 	
 	/**
-	 * Writes a command to the server with the flag (0x65) and the command. 
+	 * Writes a command to the server.
 	 * @param c Command to send
 	 * @throws IOException
 	 */
 	public void writeCmd(CMD c) throws IOException {
-		byte[] cmdByteArray = {CMD.FLAG.toByte(), c.toByte()};
-		os.write(cmdByteArray, 0, 2);
+		byte[] cmdByteArray = {c.toByte()};
+		os.write(cmdByteArray, 0, 1);
 	}
 	
 	public void close() throws IOException {

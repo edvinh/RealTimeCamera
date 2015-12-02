@@ -8,6 +8,7 @@ import java.net.Socket;
 import java.net.SocketException;
 
 import se.lth.cs.eda040.fakecamera.AxisM3006V;
+import util.Command;
 
 public class ServerSocketConnection extends Thread {
 	InputStream is;
@@ -43,8 +44,8 @@ public class ServerSocketConnection extends Thread {
 	// Reads the contents of data, one byte at a time.
 	public void read(byte[] data) throws Exception {
 		int read = 0;
-		while (read < AxisM3006V.IMAGE_BUFFER_SIZE) {
-			int n = is.read(data, read, AxisM3006V.IMAGE_BUFFER_SIZE - read); // Blocking
+		while (read < Command.LENGTH) {
+			int n = is.read(data, read, Command.LENGTH- read); // Blocking
 			if (n == -1)
 				throw new IOException();
 			read += n;

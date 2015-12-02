@@ -1,12 +1,10 @@
 package client;
 
 import java.awt.BorderLayout;
-import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.Image;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
@@ -16,15 +14,12 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.SwingUtilities;
 
-import util.Logger;
-
 // Pax Robin 
 public class ClientGUI extends JFrame {
 	public static final String TITLE = "Real-Time Camera System";
 	protected ClientMonitor monitor;
 	private static final long serialVersionUID = 1L;
 	private int currDelay;
-	private Logger log = Logger.getInstance();
 
 	public ClientGUI(ClientMonitor monitor) {
 		super();
@@ -38,6 +33,8 @@ public class ClientGUI extends JFrame {
 		// Buttons for IDLE and MOVIE
 		JRadioButton idle = new JRadioButton("Idle", true);
 		JRadioButton movie = new JRadioButton("Movie", false);
+		idle.setEnabled(false);
+		movie.setEnabled(false);
 		ItemListener item = new IdleAndMovieHandler(monitor);
 		idle.addItemListener(item);
 		movie.addItemListener(item);
@@ -48,15 +45,40 @@ public class ClientGUI extends JFrame {
 		// Buttons for synchronized and asynchronized
 		JRadioButton sync = new JRadioButton("Synchronous", true);
 		JRadioButton async = new JRadioButton("Asynchronous", false);
+		sync.setEnabled(false);
+		async.setEnabled(false);
+		SyncAndAsyncHandler hand = new SyncAndAsyncHandler(); 
+		sync.addItemListener(hand);
+		async.addItemListener(hand);
 		ButtonGroup syncSet = new ButtonGroup();
 		syncSet.add(sync);
 		syncSet.add(async);
-
+		
 		// Label for displaying the current delay
 		JLabel delay = new JLabel("Delay: " + Integer.toString(currDelay));
 
 		// Auto button
 		JRadioButton auto = new JRadioButton("Auto", true);
+		auto.addItemListener(new ItemListener() {
+			// This is the itemlistener for the auto button
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				if (e.getStateChange() == ItemEvent.SELECTED) {
+					sync.setEnabled(false);
+					async.setEnabled(false);
+					idle.setEnabled(false);
+					movie.setEnabled(false);
+					sync.setSelected(true);
+					idle.setSelected(true);
+				} else {
+					sync.setEnabled(true);
+					async.setEnabled(true);
+					idle.setEnabled(true);
+					movie.setEnabled(true);
+				}
+			}
+			
+		});
 
 		JPanel settings = new JPanel();
 		settings.setLayout(new FlowLayout());
@@ -80,7 +102,6 @@ class ImagePanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 	ImageIcon icon;
 	ClientMonitor monitor;
-	Logger log = Logger.getInstance();
 
 	ImagePanel(ClientMonitor monitor) {
 		super();
@@ -91,7 +112,7 @@ class ImagePanel extends JPanel {
 		this.setSize(200, 200);
 	}
 	
-	public void start() {
+	void start() {
 		System.out.println("started image panel");
 		while (true) {
 			refresh(monitor.getImageData());
@@ -106,12 +127,12 @@ class ImagePanel extends JPanel {
 			return;
 		}
 		
-		Image theImage = getToolkit().createImage(data);
-		getToolkit().prepareImage(theImage, -1, -1, null);
-		icon.setImage(theImage);
-		icon.paintIcon(this, this.getGraphics(), 5, 5);
+//		Image theImage = getToolkit().createImage(data);
+//		getToolkit().prepareImage(theImage, -1, -1, null);
+//		icon.setImage(theImage);
+//		icon.paintIcon(this, this.getGraphics(), 5, 5);
 		
-		/*final JPanel self = this;
+		final JPanel self = this;
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
@@ -121,8 +142,22 @@ class ImagePanel extends JPanel {
 				icon.paintIcon(self, self.getGraphics(), 5, 5);
 			}
 
-		});*/
+		});
 	}
+}
+
+class SyncAndAsyncHandler implements ItemListener {
+
+	@Override
+	public void itemStateChanged(ItemEvent e) {
+		JRadioButton pressed = (JRadioButton) e.getSource();
+		if (pressed.getText().equals("Synchronous")) {
+			// Force change to sync
+		} else {
+			// Force change to async
+		}
+	}
+	
 }
 
 class IdleAndMovieHandler implements ItemListener {
