@@ -11,14 +11,7 @@ public class CameraCaptureThread extends Thread {
 	public final static int IDLE = 5;
 	
 	
-	/**
-	 * Creates a polling thread which polls the camera at a set interval
-	 * 
-	 * @param period
-	 *            the periodicity of the polling
-	 * @param camera
-	 * 			  The camera which will be polled 
-	 */
+
 	public CameraCaptureThread(String address, int port, ServerMonitor monitor) {
 		this.monitor = monitor;
 		image = new byte[AxisM3006V.IMAGE_BUFFER_SIZE];
@@ -38,6 +31,7 @@ public class CameraCaptureThread extends Thread {
 		
 		// Connect to camera on start
 		camera.connect();
+		monitor.cameraConnected();
 		int bytesRead = 0;
 		CMD mode = CMD.IDLE;
 		
