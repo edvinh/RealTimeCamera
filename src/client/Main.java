@@ -13,14 +13,16 @@ public class Main {
 		String address = "localhost";
 		try {
 			ClientSocketConnection socket = new ClientSocketConnection(monitor,
-					address, port);
+					address, port, 0);
 			socket.start();
 		} catch (IOException e) {
 			System.err.println("Unable connect to port");
 			e.printStackTrace();
 		}
 		
-		new ClientGUI(monitor);
+		ClientGUI gui = new ClientGUI(monitor);
+		ImageDispatcher imageDispatcher = new ImageDispatcher(monitor, gui.getImagePanel());
+		imageDispatcher.start();
 		// SwingUtilities.invokeLater(new Runnable() {
 		// @Override
 		// public void run() {

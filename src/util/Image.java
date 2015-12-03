@@ -1,11 +1,14 @@
-package server;
+package util;
 
+import se.lth.cs.eda040.fakecamera.AxisM3006V;
 import util.Command.CMD;
 
 public class Image {
 	
 	public static final int MODE_SIZE = 1;
+	public static final int TIMESTAMP_SIZE = AxisM3006V.TIME_ARRAY_SIZE;
 	private byte[] timestamp, image;
+	private long lTimestamp = -1;
 	private CMD mode;
 	private byte[] total;
 	public Image(byte[] timestamp, byte[] image, CMD cmd) {
@@ -39,6 +42,21 @@ public class Image {
 		}
 		
 		return total;
+	}
+	
+	public byte[] getImage() {
+		return image;
+	}
+	
+	public long getTimestamp() {
+		if (lTimestamp == -1) {
+			for (int i = 0; i < TIMESTAMP_SIZE; i++) {
+				// Convert timestamp to int 
+				lTimestamp = (lTimestamp << 8) + (timestamp[i] & 0xff);
+			}
+		}
+		
+		return lTimestamp;
 	}
 }
 

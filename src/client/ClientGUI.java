@@ -20,6 +20,7 @@ public class ClientGUI extends JFrame {
 	protected ClientMonitor monitor;
 	private static final long serialVersionUID = 1L;
 	private int currDelay;
+	private ImagePanel imagePanel;
 
 	public ClientGUI(ClientMonitor monitor) {
 		super();
@@ -27,7 +28,7 @@ public class ClientGUI extends JFrame {
 		this.monitor = monitor;
 		this.setTitle(TITLE);
 		this.setLayout(new BorderLayout());
-		ImagePanel imagePanel = new ImagePanel(monitor);
+		imagePanel = new ImagePanel(monitor);
 		this.add(imagePanel, BorderLayout.NORTH);
 
 		// Buttons for IDLE and MOVIE
@@ -95,6 +96,10 @@ public class ClientGUI extends JFrame {
 		this.pack();
 		imagePanel.start();
 	}
+	
+	public ImagePanel getImagePanel() {
+		return imagePanel;
+	}
 
 }
 
@@ -115,13 +120,13 @@ class ImagePanel extends JPanel {
 	void start() {
 		System.out.println("started image panel");
 		while (true) {
-			refresh(monitor.getImageData());
+			refresh(monitor.getImageData(0));
 			// Robin löser detta med sina s.k. DANK SKILLS 
 			try { Thread.sleep(30L); } catch (Exception e) {}
 		}
 	}
 
-	void refresh(final byte[] data) {
+	public void refresh(final byte[] data) {
 		if (data == null) {
 			System.out.println("ClientGUI - received null image");
 			return;

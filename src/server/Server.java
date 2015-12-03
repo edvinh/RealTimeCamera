@@ -12,9 +12,9 @@ public class Server {
 		try {
 			// Start server socket
 			socket = new ServerSocketConnection(3001, monitor);
-			//InputHandler inputHandler = new InputHandler(socket);
+			InputHandler inputHandler = new InputHandler(socket);
 			socket.start();
-			//inputHandler.start();
+			inputHandler.start();
 		} catch (IOException e) {
 			System.err.println("Server connection failure");
 			e.printStackTrace();

@@ -1,6 +1,7 @@
 package server;
 
 import se.lth.cs.eda040.fakecamera.AxisM3006V;
+import util.Image;
 import util.Command.CMD;
 
 public class CameraCaptureThread extends Thread {
@@ -36,7 +37,7 @@ public class CameraCaptureThread extends Thread {
 		CMD mode = CMD.IDLE;
 		
 		while (!interrupted()) {
-			//System.out.println("bytes read: " + bytesRead);
+			System.out.println("bytes read: " + bytesRead);
 			
 			// Read image data from camera
 			bytesRead = camera.getJPEG(image, 0);

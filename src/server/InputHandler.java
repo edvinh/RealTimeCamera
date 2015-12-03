@@ -3,6 +3,8 @@ package server;
 import java.io.IOException;
 import java.net.ServerSocket;
 
+import util.Command;
+
 public class InputHandler extends Thread {
 	
 	private ServerSocketConnection socket;
@@ -11,7 +13,7 @@ public class InputHandler extends Thread {
 	}
 	
 	public void run () {
-		byte[] data = new byte[10000000];
+		byte[] data = new byte[Command.LENGTH];
 		while (true) {
 			try {
 				System.out.println("Reading...");

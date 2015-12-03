@@ -41,7 +41,7 @@ public class ImageBuilder {
 		
 
 		int offset = TIMESTAMP_SIZE + 1;
-		
+		imageData = new byte[IMAGE_BUFFER_SIZE];
 		// Copy the image to the image array
 		for (int i = 0; i < IMAGE_BUFFER_SIZE; i++) {
 			imageData[i] = data[offset + i]; 
