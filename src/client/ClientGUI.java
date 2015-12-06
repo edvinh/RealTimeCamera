@@ -32,8 +32,8 @@ public class ClientGUI extends JFrame {
 		this.add(imagePanel, BorderLayout.NORTH);
 
 		// Buttons for IDLE and MOVIE
-		JRadioButton idle = new JRadioButton("Idle", true);
-		JRadioButton movie = new JRadioButton("Movie", false);
+		final JRadioButton idle = new JRadioButton("Idle", true);
+		final JRadioButton movie = new JRadioButton("Movie", false);
 		idle.setEnabled(false);
 		movie.setEnabled(false);
 		ItemListener item = new IdleAndMovieHandler(monitor);
@@ -44,8 +44,8 @@ public class ClientGUI extends JFrame {
 		modes.add(movie);
 
 		// Buttons for synchronized and asynchronized
-		JRadioButton sync = new JRadioButton("Synchronous", true);
-		JRadioButton async = new JRadioButton("Asynchronous", false);
+		final JRadioButton sync = new JRadioButton("Synchronous", true);
+		final JRadioButton async = new JRadioButton("Asynchronous", false);
 		sync.setEnabled(false);
 		async.setEnabled(false);
 		SyncAndAsyncHandler hand = new SyncAndAsyncHandler(); 
@@ -119,35 +119,20 @@ class ImagePanel extends JPanel {
 	
 	void start() {
 		System.out.println("started image panel");
-		while (true) {
-			refresh(monitor.getImageData(0));
-			// Robin löser detta med sina s.k. DANK SKILLS 
-			try { Thread.sleep(30L); } catch (Exception e) {}
-		}
 	}
 
-	public void refresh(final byte[] data) {
-		if (data == null) {
+	public void refresh(util.Image image) {
+		if (image == null) {
 			System.out.println("ClientGUI - received null image");
 			return;
 		}
 		
-//		Image theImage = getToolkit().createImage(data);
-//		getToolkit().prepareImage(theImage, -1, -1, null);
-//		icon.setImage(theImage);
-//		icon.paintIcon(this, this.getGraphics(), 5, 5);
-		
-		final JPanel self = this;
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				Image theImage = getToolkit().createImage(data);
-				getToolkit().prepareImage(theImage, -1, -1, null);
-				icon.setImage(theImage);
-				icon.paintIcon(self, self.getGraphics(), 5, 5);
-			}
-
-		});
+		System.out.println("ClientGUI: Refreshing... Timestamp: " + image.getTimestamp());
+	
+		Image theImage = getToolkit().createImage(image.getImage());
+		getToolkit().prepareImage(theImage, -1, -1, null);
+		icon.setImage(theImage);
+		icon.paintIcon(this, this.getGraphics(), 5, 5);
 	}
 }
 

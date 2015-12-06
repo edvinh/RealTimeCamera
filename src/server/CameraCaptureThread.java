@@ -37,7 +37,6 @@ public class CameraCaptureThread extends Thread {
 		CMD mode = CMD.IDLE;
 		
 		while (!interrupted()) {
-			System.out.println("bytes read: " + bytesRead);
 			
 			// Read image data from camera
 			bytesRead = camera.getJPEG(image, 0);
@@ -47,10 +46,11 @@ public class CameraCaptureThread extends Thread {
 			camera.getTime(timestamp, 0);
 			
 			// Set to movie if motion detected
-			mode = camera.motionDetected() ? CMD.MOVIE : CMD.IDLE;  
+			mode = camera.motionDetected() ? CMD.MOVIE : CMD.IDLE;
 			
 			// Set image in monitor
 			Image img = new Image(timestamp, image, mode);
+
 			monitor.setImageData(img.toBytes());
 		}
 	}

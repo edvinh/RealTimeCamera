@@ -11,8 +11,29 @@ public class Image {
 	private long lTimestamp = -1;
 	private CMD mode;
 	private byte[] total;
+	
+	
+	/**
+	 * Creates a new Image object with a timestamp, image data, and mode. 
+	 * @param timestamp timestamp as a byte array
+	 * @param image image as a byte array
+	 * @param cmd as a CMD (byte). 
+	 */
 	public Image(byte[] timestamp, byte[] image, CMD cmd) {
 		this.timestamp = timestamp;
+		this.image = image;
+		this.mode = cmd;
+	}
+	
+	
+	/**
+	 * Creates a new Image object with a timestamp, image data, and mode. 
+	 * @param timestamp timestamp as a long
+	 * @param image image as a byte array
+	 * @param cmd as a CMD (byte). 
+	 */
+	public Image(long timestamp, byte[] image, CMD cmd) {
+		this.lTimestamp = timestamp;
 		this.image = image;
 		this.mode = cmd;
 	}
@@ -48,10 +69,14 @@ public class Image {
 		return image;
 	}
 	
+	public CMD getMode() {
+		return mode;
+	}
+	
 	public long getTimestamp() {
 		if (lTimestamp == -1) {
 			for (int i = 0; i < TIMESTAMP_SIZE; i++) {
-				// Convert timestamp to int 
+				// Convert timestamp to long 
 				lTimestamp = (lTimestamp << 8) + (timestamp[i] & 0xff);
 			}
 		}

@@ -2,6 +2,7 @@ package client;
 
 import se.lth.cs.eda040.fakecamera.AxisM3006V;
 import util.Command.CMD;
+import util.Image;
 
 public class ImageBuilder {
 	
@@ -9,13 +10,19 @@ public class ImageBuilder {
 	public static final int TIMESTAMP_SIZE = AxisM3006V.TIME_ARRAY_SIZE;
 	public static final int CMD_SIZE = 1;
 	
-	private byte[] imageData; 
-	private byte[] timestamp;
-	private long lTimestamp;
-	private CMD cmd;
+	private static byte[] imageData; 
+	private static byte[] timestamp;
+	private static long lTimestamp;
+	private static CMD cmd;
 	
-	public ImageBuilder(byte[] data) {
-		timestamp = new byte[TIMESTAMP_SIZE];
+	protected ImageBuilder() {
+	
+	}
+	
+	public static synchronized Image build(byte[] data) {
+		
+		if (imageData == null) imageData = new byte[IMAGE_BUFFER_SIZE];
+		if (timestamp == null) timestamp = new byte[TIMESTAMP_SIZE];
 		
 		// Copy the first 8 bytes to the timestamp array
 		for (int i = 0; i < TIMESTAMP_SIZE; i++) {
@@ -41,26 +48,11 @@ public class ImageBuilder {
 		
 
 		int offset = TIMESTAMP_SIZE + 1;
-		imageData = new byte[IMAGE_BUFFER_SIZE];
 		// Copy the image to the image array
 		for (int i = 0; i < IMAGE_BUFFER_SIZE; i++) {
 			imageData[i] = data[offset + i]; 
 		}
-	}
-	
-	public byte[] getImage() {
-		return imageData;
-	}
-	
-	public CMD getCommand() {
-		return cmd;
-	}
-	
-	public long getTimestamp() {
-		return lTimestamp;
-	}
-	
-	public byte[] getTimestampAsByteArray() {
-		return timestamp;
+		
+		return new Image(lTimestamp, imageData, cmd);
 	}
 }

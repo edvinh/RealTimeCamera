@@ -2,6 +2,8 @@ package client;
 
 import javax.swing.SwingUtilities;
 
+import util.Image;
+
 public class ImageDispatcher extends Thread {
 	
 	private ClientMonitor monitor;
@@ -13,12 +15,14 @@ public class ImageDispatcher extends Thread {
 	
 	public void run() {
 		while (true) {
-			// TODO do image class instead
-			byte[] imageData = monitor.getImageData(0);
-			if (imageData != null) {
+			//System.out.println("imageDispatcher running...");
+			final Image image = monitor.getImage();
+			//System.out.println("image length:" + image.getImage().length);
+			if (image != null && image.getImage() != null) {
 				SwingUtilities.invokeLater(new Runnable () {
 					public void run () {
-						panel.refresh(imageData);
+						System.out.println("refreshing image: " + image.getImage().length);
+						panel.refresh(image);
 					}
 				});
 			}

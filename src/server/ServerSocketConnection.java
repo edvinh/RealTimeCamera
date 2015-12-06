@@ -31,7 +31,7 @@ public class ServerSocketConnection extends Thread {
 			
 			while (!interrupted()) {
 				if (monitor.hasNewImage()) {
-					System.out.println("ServerSocket: writing data...");
+					//System.out.println("ServerSocket: writing data...");
 					write(monitor.getImageData());
 				}
 			}
@@ -55,6 +55,7 @@ public class ServerSocketConnection extends Thread {
 	// Writes data to the Output Stream
 	public void write(byte[] data) throws IOException {
 		os.write(data, 0, AxisM3006V.IMAGE_BUFFER_SIZE + AxisM3006V.TIME_ARRAY_SIZE + 1);
+		os.flush();
 	}
 	
 	public void close() throws IOException {

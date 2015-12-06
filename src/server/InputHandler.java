@@ -16,12 +16,12 @@ public class InputHandler extends Thread {
 		byte[] data = new byte[Command.LENGTH];
 		while (true) {
 			try {
-				System.out.println("Reading...");
+				//System.out.println("Reading...");
 				socket.read(data);
 				// Do stuff with input
 			} catch (Exception e) {
 				//e.printStackTrace();
-				System.out.println("Exception in input handler");
+				//System.out.println("Exception in input handler");
 			}
 			
 		}

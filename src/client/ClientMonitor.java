@@ -1,34 +1,32 @@
 package client;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 
-import se.lth.cs.eda040.fakecamera.AxisM3006V;
 import util.Command.CMD;
+import util.Image;
 
 public class ClientMonitor {
-	private byte[] imageData;
-	private long timestamp;
-	private CMD cmd;
+	private Image lastImage;
 	private boolean newImage;
 	private ImageBuffer imageBuffer;
-	private ImageBuilder imgBuilder;
 	
 	public ClientMonitor() {
-		imageData = new byte[AxisM3006V.IMAGE_BUFFER_SIZE];
 		imageBuffer = new ImageBuffer();
 		newImage = false;
 	}
 	
-	public synchronized byte[] getImageData(int cameraId) {
-		while(!imageBuffer.hasImage(cameraId)){
+	public synchronized Image getImage() {
+		while(!imageBuffer.hasImage()) {
 			try {
 				wait();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
-		newImage = false;
-		return imageData;
+	
+		newImage = true;
+		notifyAll();
+		return lastImage;
 	}
 	
 //	public synchronized long getTimestamp() {
@@ -36,30 +34,20 @@ public class ClientMonitor {
 //	}
 	
 	public synchronized CMD getCommand() {
-		return cmd;
+		return lastImage.getMode();
 	}
 	
 	public synchronized ImageBuffer getImageBuffer() {
 		return imageBuffer;
 	}
 	
-	public synchronized void setImageData(byte[] data, int cameraId) {
-		imgBuilder = new ImageBuilder(data);
-		imageData = imgBuilder.getImage();
-		timestamp = imgBuilder.getTimestamp();
-		cmd = imgBuilder.getCommand();
+	public synchronized void setImage(byte[] image) {
+		lastImage = ImageBuilder.build(image);
 		newImage = true;
-		LinkedList<byte[]> buffer;
-		
-		if (!imageBuffer.exists(cameraId)) {
-			buffer = new LinkedList<byte[]>();
-			imageBuffer.addQueue(buffer);
-		} else {
-			imageBuffer.put(imageData, cameraId);
-		}
-		
+		imageBuffer.put(lastImage);
 		notifyAll();
 	}
+
 
 	
 	/**
