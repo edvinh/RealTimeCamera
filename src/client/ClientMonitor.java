@@ -49,14 +49,14 @@ public class ClientMonitor {
 	}
 	
 	public synchronized boolean modeChanged() {
-		if (modeChanged) {
-			modeChanged = false;
-			return true;
-		} else {
+		while (!modeChanged) {
 			try {
 				wait();
-			} catch (InterruptedException e) {e.printStackTrace();}
-			return false;
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
+		modeChanged = false;
+		return true;
 	}
 }

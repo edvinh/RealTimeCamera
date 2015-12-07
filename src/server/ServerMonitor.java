@@ -42,7 +42,7 @@ public class ServerMonitor {
 		
 		
 		while (timeLeft > 0) {
-			//System.out.println("timeLeft: " + timeLeft);
+			System.out.println("timeLeft: " + timeLeft);
 			try {
 				
 				// If mode is auto and motion was detected, cancel the wait
