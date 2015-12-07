@@ -81,7 +81,6 @@ public class ClientGUI extends JFrame {
 					createNotification(CMD.MOVIE + " entered");
 				}
 			}
-
 		});
 		ButtonGroup modes = new ButtonGroup();
 		modes.add(idle);
@@ -99,22 +98,20 @@ public class ClientGUI extends JFrame {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
 				if (e.getStateChange() == ItemEvent.SELECTED) {
-					monitor.setMode(CMD.SYNC);
+					monitor.setSyncMode(CMD.SYNC);
 					createNotification(CMD.SYNC + " entered");
 				}
 			}
-
 		});
 		async.addItemListener(new ItemListener() {
 
 			@Override
 			public void itemStateChanged(ItemEvent e) {
 				if (e.getStateChange() == ItemEvent.SELECTED) {
-					monitor.setMode(CMD.ASYNC);
+					monitor.setSyncMode(CMD.ASYNC);
 					createNotification(CMD.ASYNC + " entered");
 				}
 			}
-
 		});
 		ButtonGroup syncSet = new ButtonGroup();
 		syncSet.add(sync);
@@ -135,11 +132,10 @@ public class ClientGUI extends JFrame {
 					async.setEnabled(false);
 					idle.setEnabled(false);
 					movie.setEnabled(false);
-					sync.doClick();
-					idle.doClick();
 					createNotification(CMD.AUTO + " entered");
+					monitor.setSyncMode(CMD.AUTO);
 				} else {
-					if (idle.isSelected()) {
+					/*if (idle.isSelected()) {
 						idle.doClick();
 					} else {
 						movie.doClick();
@@ -148,7 +144,12 @@ public class ClientGUI extends JFrame {
 						sync.doClick();
 					} else {
 						async.doClick();
-					}
+					}*/
+					
+					idle.doClick();
+					sync.doClick();
+					monitor.setSyncMode(CMD.SYNC);
+					monitor.setMode(CMD.IDLE);
 					sync.setEnabled(true);
 					async.setEnabled(true);
 					idle.setEnabled(true);
@@ -223,8 +224,8 @@ class ImagePanel extends JPanel {
 		icon.setImage(theImage);
 		icon.paintIcon(this, this.getGraphics(), 5, 5);
 		double delay = System.currentTimeMillis() - image.getTimestamp();
-		// System.out.println(delay);
 		gui.updateDelay(delay);
+		
 	}
 
 }

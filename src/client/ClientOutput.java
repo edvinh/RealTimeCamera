@@ -24,6 +24,14 @@ public class ClientOutput extends Thread {
 					e.printStackTrace();
 				}
 			}
+			
+			if (monitor.syncModeChanged()) {
+				try {
+					socket.writeCmd(monitor.getSyncMode());
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 	}
 }

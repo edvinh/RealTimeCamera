@@ -22,7 +22,6 @@ public class InputHandler extends Thread {
 				// Get the command
 				byte bCmd = data[0];
 				CMD cmd = Helper.byteToCmd(bCmd);
-				System.out.println("Set mode: " + cmd.toString());
 				
 				if (cmd == CMD.MOVIE || cmd == cmd.IDLE) {
 					monitor.setMode(cmd);	

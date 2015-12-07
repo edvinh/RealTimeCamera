@@ -78,6 +78,7 @@ public class ServerMonitor {
 	}
 	
 	public synchronized void setSyncMode(CMD cmd) {
+		System.out.println("syncmode set: " + cmd.toString());
 		syncMode = cmd;
 		notifyAll();
 	}
@@ -97,17 +98,20 @@ public class ServerMonitor {
 	
 	public synchronized void setMotionDetected(boolean motion) {
 		motionDetected = motion;
-		if (motion) {
-			System.out.println("Motion detected!");
-		} else {
-			System.out.println("no motion detected");
-		}
+//		if (motion) {
+//			System.out.println("Motion detected!");
+//		} else {
+//			System.out.println("no motion detected");
+//		}
+		
 		// If sync mode is auto, set the camera to movie or idle 
 		// mode depending on if motion was detected or not
 		if (motion == true && syncMode == CMD.AUTO) {
 			mode = CMD.MOVIE;
+			System.out.println("mode set to movie in motiondetected, sync: " + syncMode.toString());
 		} else if (motion == false && syncMode == CMD.AUTO) {
 			mode = CMD.IDLE;
+			System.out.println("mode set to idle in motiondetected, sync: " + syncMode.toString());
 		}
 		
 		notifyAll();

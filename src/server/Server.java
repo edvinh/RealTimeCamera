@@ -8,7 +8,7 @@ public class Server {
 		ServerSocketConnection socket = null;
 		ServerMonitor monitor = new ServerMonitor();
 		int port = 3001;
-		new CameraCaptureThread("argus-2.student.lth.se", port, monitor).start();
+		new CameraCaptureThread("argus-3.student.lth.se", port, monitor).start();
 		try {
 			// Start server socket
 			socket = new ServerSocketConnection(3001, monitor);
