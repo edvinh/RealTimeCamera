@@ -19,6 +19,7 @@ public class Main {
 			clientOutput.start();
 		} catch (IOException e) {
 			System.err.println("Unable connect to port");
+			
 			e.printStackTrace();
 		}
 

@@ -46,6 +46,7 @@ public class CameraCaptureThread extends Thread {
 			//Get the timestamp
 			byte[] timestamp = new byte[AxisM3006V.TIME_ARRAY_SIZE];
 			camera.getTime(timestamp, 0);
+			System.out.println(camera.motionDetected());
 			
 			// Set to movie if motion detected
 			mode = camera.motionDetected() ? CMD.MOTION : CMD.NO_MOTION;

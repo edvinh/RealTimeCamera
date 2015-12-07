@@ -3,11 +3,15 @@ package client;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.KeyEvent;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
@@ -16,11 +20,11 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 
 import util.Command.CMD;
 import util.ImageFrame;
-
-import com.sun.glass.events.KeyEvent;
 
 public class ClientGUI extends JFrame {
 	public static final String TITLE = "Real-Time Camera System";
@@ -28,27 +32,57 @@ public class ClientGUI extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private ImagePanel imagePanel;
 	private JLabel delayLabel;
-	private double threshold;
+	private final JRadioButton idle, movie;
+	private JTextArea field;
 
 	public ClientGUI(ClientMonitor monitor) {
 		super();
 		this.monitor = monitor;
-		this.setMinimumSize(new Dimension(800, 600));
+		this.setMinimumSize(new Dimension(840, 640));
 		this.setTitle(TITLE);
 		this.setLayout(new BorderLayout());
 		imagePanel = new ImagePanel(monitor, this);
-		this.add(imagePanel, BorderLayout.NORTH);
+		this.add(imagePanel, BorderLayout.WEST);
+
+		// Notification field
+		field = new JTextArea(Time.getCurrentTime() + ": System started \n",
+				40, 15);
+		JScrollPane pane = new JScrollPane(field);
+		this.add(pane, BorderLayout.EAST);
+		field.setEditable(false);
+		field.setVisible(true);
+		field.setLineWrap(true);
+		field.setWrapStyleWord(true);
 
 		// Buttons for IDLE and MOVIE
-		final JRadioButton idle = new JRadioButton("Idle", true);
-		final JRadioButton movie = new JRadioButton("Movie", false);
+		idle = new JRadioButton("Idle", true);
+		movie = new JRadioButton("Movie", false);
 		idle.setMnemonic(KeyEvent.VK_I);
 		movie.setMnemonic(KeyEvent.VK_M);
 		idle.setEnabled(false);
 		movie.setEnabled(false);
-		ItemListener item = new IdleAndMovieHandler(monitor);
-		idle.addItemListener(item);
-		movie.addItemListener(item);
+		idle.addItemListener(new ItemListener() {
+
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				if (e.getStateChange() == ItemEvent.SELECTED) {
+					monitor.setMode(CMD.IDLE);
+					createNotification(CMD.IDLE + " entered");
+				}
+			}
+
+		});
+		movie.addItemListener(new ItemListener() {
+
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				if (e.getStateChange() == ItemEvent.SELECTED) {
+					monitor.setMode(CMD.MOVIE);
+					createNotification(CMD.MOVIE + " entered");
+				}
+			}
+
+		});
 		ButtonGroup modes = new ButtonGroup();
 		modes.add(idle);
 		modes.add(movie);
@@ -57,12 +91,31 @@ public class ClientGUI extends JFrame {
 		final JRadioButton sync = new JRadioButton("Synchronous", true);
 		final JRadioButton async = new JRadioButton("Asynchronous", false);
 		sync.setMnemonic(KeyEvent.VK_S);
-		async.setMnemonic(KeyEvent.VK_A);
+		async.setMnemonic(KeyEvent.VK_X);
 		sync.setEnabled(false);
 		async.setEnabled(false);
-		SyncAndAsyncHandler hand = new SyncAndAsyncHandler(monitor);
-		sync.addItemListener(hand);
-		async.addItemListener(hand);
+		sync.addItemListener(new ItemListener() {
+
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				if (e.getStateChange() == ItemEvent.SELECTED) {
+					monitor.setMode(CMD.SYNC);
+					createNotification(CMD.SYNC + " entered");
+				}
+			}
+			
+		});
+		async.addItemListener(new ItemListener() {
+
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				if (e.getStateChange() == ItemEvent.SELECTED) {
+					monitor.setMode(CMD.ASYNC);
+					createNotification(CMD.ASYNC + " entered");
+				}
+			}
+			
+		});
 		ButtonGroup syncSet = new ButtonGroup();
 		syncSet.add(sync);
 		syncSet.add(async);
@@ -82,10 +135,9 @@ public class ClientGUI extends JFrame {
 					async.setEnabled(false);
 					idle.setEnabled(false);
 					movie.setEnabled(false);
-					sync.setSelected(true);
-					idle.setSelected(true);
 					sync.doClick();
 					idle.doClick();
+					createNotification(CMD.AUTO + " entered");
 				} else {
 					sync.setEnabled(true);
 					async.setEnabled(true);
@@ -111,12 +163,22 @@ public class ClientGUI extends JFrame {
 		this.pack();
 	}
 
+	public void createNotification(String not) {
+		field.append(Time.getCurrentTime() + ": " + not + "\n");
+	}
+
 	public ImagePanel getImagePanel() {
 		return imagePanel;
 	}
 
 	public void updateDelay(double delay) {
 		delayLabel.setText("Delay: " + Double.toString(delay) + " ms");
+	}
+
+	public void setMovieMode() {
+		movie.doClick();
+		movie.setSelected(true);
+
 	}
 
 }
@@ -154,42 +216,13 @@ class ImagePanel extends JPanel {
 		// System.out.println(delay);
 		gui.updateDelay(delay);
 	}
-}
-
-class SyncAndAsyncHandler implements ItemListener {
-	private ClientMonitor mon;
-
-	SyncAndAsyncHandler(ClientMonitor mon) {
-		this.mon = mon;
-	}
-
-	@Override
-	public void itemStateChanged(ItemEvent e) {
-		JRadioButton pressed = (JRadioButton) e.getSource();
-		if (pressed.getText().equals("Synchronous")) {
-			mon.setMode(CMD.SYNC);
-		} else {
-			mon.setMode(CMD.ASYNC);
-		}
-	}
 
 }
 
-class IdleAndMovieHandler implements ItemListener {
-	private ClientMonitor mon;
-
-	IdleAndMovieHandler(ClientMonitor mon) {
-		this.mon = mon;
-	}
-
-	@Override
-	public void itemStateChanged(ItemEvent event) {
-		JRadioButton pressed = (JRadioButton) event.getSource();
-		if (pressed.getText().equals("Movie")) {
-			mon.setMode(CMD.MOVIE);
-		} else {
-			mon.setMode(CMD.IDLE);
-		}
-
+class Time {
+	static String getCurrentTime() {
+		Calendar cal = Calendar.getInstance();
+		SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+		return sdf.format(cal.getTime());
 	}
 }
