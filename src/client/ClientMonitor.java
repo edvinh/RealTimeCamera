@@ -1,22 +1,20 @@
 package client;
 
-import java.util.ArrayList;
-
 import util.Command.CMD;
-import util.Image;
+import util.ImageFrame;
 
 public class ClientMonitor {
-	private Image lastImage;
-	private boolean newImage;
 	private ImageBuffer imageBuffer;
-	
+	private ImageFrame lastImage;
+	private CMD mode;
+	private boolean modeChanged = true; 
 	public ClientMonitor() {
 		imageBuffer = new ImageBuffer();
-		newImage = false;
+		mode = CMD.AUTO;
 	}
 	
-	public synchronized Image getImage() {
-		while(!imageBuffer.hasImage()) {
+	public synchronized ImageFrame getImage() {
+		while (!imageBuffer.hasImage()) {
 			try {
 				wait();
 			} catch (InterruptedException e) {
@@ -24,17 +22,12 @@ public class ClientMonitor {
 			}
 		}
 	
-		newImage = true;
 		notifyAll();
-		return lastImage;
+		return imageBuffer.pop();
 	}
 	
-//	public synchronized long getTimestamp() {
-//		return timestamp;
-//	}
-	
-	public synchronized CMD getCommand() {
-		return lastImage.getMode();
+	public synchronized CMD getMode() {
+		return mode;
 	}
 	
 	public synchronized ImageBuffer getImageBuffer() {
@@ -43,18 +36,27 @@ public class ClientMonitor {
 	
 	public synchronized void setImage(byte[] image) {
 		lastImage = ImageBuilder.build(image);
-		newImage = true;
 		imageBuffer.put(lastImage);
 		notifyAll();
 	}
-
-
 	
-	/**
-	 * Returns true once if there is a new image. Will only work with one socket connection. TODO FIX 
-	 * @return
-	 */
-//	public synchronized boolean hasNewImage() {
-//		return newImage;
-//	}
+	public synchronized void setMode(CMD cmd) {
+		if (mode != cmd) {
+			mode = cmd;
+			modeChanged = true;
+			notifyAll();
+		}
+	}
+	
+	public synchronized boolean modeChanged() {
+		if (modeChanged) {
+			modeChanged = false;
+			return true;
+		} else {
+			try {
+				wait();
+			} catch (InterruptedException e) {e.printStackTrace();}
+			return false;
+		}
+	}
 }

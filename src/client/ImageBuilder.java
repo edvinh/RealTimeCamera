@@ -2,7 +2,7 @@ package client;
 
 import se.lth.cs.eda040.fakecamera.AxisM3006V;
 import util.Command.CMD;
-import util.Image;
+import util.ImageFrame;
 
 public class ImageBuilder {
 	
@@ -19,10 +19,10 @@ public class ImageBuilder {
 	
 	}
 	
-	public static synchronized Image build(byte[] data) {
+	public static synchronized ImageFrame build(byte[] data) {
 		
-		if (imageData == null) imageData = new byte[IMAGE_BUFFER_SIZE];
-		if (timestamp == null) timestamp = new byte[TIMESTAMP_SIZE];
+		imageData = new byte[data.length - TIMESTAMP_SIZE - CMD_SIZE];
+		timestamp = new byte[TIMESTAMP_SIZE];
 		
 		// Copy the first 8 bytes to the timestamp array
 		for (int i = 0; i < TIMESTAMP_SIZE; i++) {
@@ -49,10 +49,10 @@ public class ImageBuilder {
 
 		int offset = TIMESTAMP_SIZE + 1;
 		// Copy the image to the image array
-		for (int i = 0; i < IMAGE_BUFFER_SIZE; i++) {
+		for (int i = 0; i < data.length - offset; i++) {
 			imageData[i] = data[offset + i]; 
 		}
 		
-		return new Image(lTimestamp, imageData, cmd);
+		return new ImageFrame(lTimestamp, imageData, cmd);
 	}
 }

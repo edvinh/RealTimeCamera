@@ -5,12 +5,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.LinkedList;
 
 import se.lth.cs.eda040.fakecamera.AxisM3006V;
 import util.Command.CMD;
-import util.Image;
+import util.Constants;
+import util.Helper;
 
 public class ClientSocketConnection extends Thread {
 	private InputStream is;
@@ -31,20 +30,7 @@ public class ClientSocketConnection extends Thread {
 	public void run() {
 		while (true) {
 			try {
-				//read();
-				int bufferSize = AxisM3006V.IMAGE_BUFFER_SIZE + AxisM3006V.TIME_ARRAY_SIZE + 1;
-				byte[] data = new byte[bufferSize];
-				int read = 0;
-				while (read < bufferSize) {
-					int n = is.read(data, read, bufferSize - read); // Blocking
-					if (n == -1)
-						throw new IOException();
-					read += n;
-				}
-				
-				if (read != 0) {
-					monitor.setImage(data);
-				}
+				read();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -52,12 +38,28 @@ public class ClientSocketConnection extends Thread {
 	}
 
 	// Reads the contents of data, one byte at a time.
-	public void read() throws IOException {
-		int bufferSize = AxisM3006V.IMAGE_BUFFER_SIZE + AxisM3006V.TIME_ARRAY_SIZE + 1;
-		byte[] data = new byte[bufferSize];
+	public void read() throws IOException {		
+		
+		// Read the image size
+		int packageLen = Constants.IMAGE_PACKAGE_SIZE;
+		byte[] imageBufferSize = new byte[packageLen];
 		int read = 0;
+		int n = 0;
+		while(read < packageLen) {
+			n = is.read(imageBufferSize, read, packageLen - read);
+			if(n != -1)	{
+				read = read + n;
+			}
+		}
+		
+		// Get the image size
+		int imageSize = Helper.byteArrayToInt(imageBufferSize);
+		
+		int bufferSize = imageSize + AxisM3006V.TIME_ARRAY_SIZE + 1;
+		byte[] data = new byte[bufferSize];
+		read = 0;
 		while (read < bufferSize) {
-			int n = is.read(data, read, bufferSize - read); // Blocking
+			n = is.read(data, read, bufferSize - read); // Blocking
 			if (n == -1)
 				throw new IOException();
 			read += n;

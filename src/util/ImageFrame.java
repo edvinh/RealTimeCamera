@@ -3,10 +3,11 @@ package util;
 import se.lth.cs.eda040.fakecamera.AxisM3006V;
 import util.Command.CMD;
 
-public class Image {
+public class ImageFrame {
 	
-	public static final int MODE_SIZE = 1;
-	public static final int TIMESTAMP_SIZE = AxisM3006V.TIME_ARRAY_SIZE;
+	public static final int MODE_SIZE = Constants.MODE_SIZE;
+	public static final int TIMESTAMP_SIZE = Constants.TIMESTAMP_SIZE;
+	public static final int IMAGE_PACKAGE_SIZE = Constants.IMAGE_PACKAGE_SIZE;
 	private byte[] timestamp, image;
 	private long lTimestamp = -1;
 	private CMD mode;
@@ -19,7 +20,7 @@ public class Image {
 	 * @param image image as a byte array
 	 * @param cmd as a CMD (byte). 
 	 */
-	public Image(byte[] timestamp, byte[] image, CMD cmd) {
+	public ImageFrame(byte[] timestamp, byte[] image, CMD cmd) {
 		this.timestamp = timestamp;
 		this.image = image;
 		this.mode = cmd;
@@ -32,7 +33,7 @@ public class Image {
 	 * @param image image as a byte array
 	 * @param cmd as a CMD (byte). 
 	 */
-	public Image(long timestamp, byte[] image, CMD cmd) {
+	public ImageFrame(long timestamp, byte[] image, CMD cmd) {
 		this.lTimestamp = timestamp;
 		this.image = image;
 		this.mode = cmd;
@@ -43,18 +44,29 @@ public class Image {
 		// If total isn't set, generate it
 		if (total == null) {
 			// Set the length
-			total = new byte[timestamp.length + image.length + MODE_SIZE];
+			total = new byte[IMAGE_PACKAGE_SIZE + timestamp.length + image.length + MODE_SIZE];
+			byte[] imgSize = Helper.intToByteArray(image.length);
+			
+			int fromBytes = Helper.byteArrayToInt(imgSize);
+			
+			for (int i = 0; i < IMAGE_PACKAGE_SIZE; i++) {
+				total[i] = imgSize[i];
+			}
+			
+			int offset = IMAGE_PACKAGE_SIZE;
 			
 			// Copy the timestamp to the beginning of the array
 			for (int i = 0; i < timestamp.length; i++) {
-				total[i] = timestamp[i];
+				total[i + offset] = timestamp[i];
 			}
 			
+			offset += timestamp.length;
+			
 			// Copy the mode after the timestamp
-			total[timestamp.length] = mode.toByte();
+			total[offset] = mode.toByte();
 			
 			// Calculate the image offset
-			int offset = timestamp.length + 1;
+			offset += 1;
 			
 			// Copy image to total
 			for (int i = 0; i < image.length; i++) {
@@ -85,9 +97,10 @@ public class Image {
 	}
 }
 
-/*                IMAGE PROTOCOL
- *     8 bytes     1 byte       variable bytes
- *  ________________________________________________
- * |__timestamp__|__mode__|__________IMAGE__________| 
- *
+
+
+/*                         IMAGE PROTOCOL
+ *     4 bytes      8 bytes     1 byte       variable bytes
+ *  _____________________________________________________________
+ * |_image size_|__timestamp__|__mode__|__________IMAGE__________|
  */

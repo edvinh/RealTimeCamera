@@ -15,12 +15,12 @@ public class Main {
 			ClientSocketConnection socket = new ClientSocketConnection(monitor,
 					address, port);
 			socket.start();
+			ClientOutput clientOutput = new ClientOutput(socket, monitor);
+			clientOutput.start();
 		} catch (IOException e) {
 			System.err.println("Unable connect to port");
 			e.printStackTrace();
 		}
-
-		// ClientGUI gui = new ClientGUI(monitor);
 
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
@@ -32,5 +32,4 @@ public class Main {
 			}
 		});
 	}
-
 }

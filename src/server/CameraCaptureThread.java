@@ -1,7 +1,7 @@
 package server;
 
 import se.lth.cs.eda040.fakecamera.AxisM3006V;
-import util.Image;
+import util.ImageFrame;
 import util.Command.CMD;
 
 public class CameraCaptureThread extends Thread {
@@ -34,24 +34,44 @@ public class CameraCaptureThread extends Thread {
 		camera.connect();
 		monitor.cameraConnected();
 		int bytesRead = 0;
-		CMD mode = CMD.IDLE;
+		CMD mode = CMD.NO_MOTION;
 		
 		while (!interrupted()) {
 			
 			// Read image data from camera
 			bytesRead = camera.getJPEG(image, 0);
 			
+			byte[] trimmedImage = trim(image, bytesRead);
+			
 			//Get the timestamp
 			byte[] timestamp = new byte[AxisM3006V.TIME_ARRAY_SIZE];
 			camera.getTime(timestamp, 0);
 			
 			// Set to movie if motion detected
-			mode = camera.motionDetected() ? CMD.MOVIE : CMD.IDLE;
+			mode = camera.motionDetected() ? CMD.MOTION : CMD.NO_MOTION;
+			
+			if (camera.motionDetected()) {
+				mode = CMD.MOTION;
+				monitor.setMotionDetected(true);
+			}  else {
+				mode = CMD.NO_MOTION;
+				monitor.setMotionDetected(false);
+			} 
 			
 			// Set image in monitor
-			Image img = new Image(timestamp, image, mode);
-
-			monitor.setImageData(img.toBytes());
+			ImageFrame img = new ImageFrame(timestamp, trimmedImage, mode);
+			byte[] imgBytes = img.toBytes();
+			monitor.setImageData(imgBytes);
 		}
 	}
+	
+	private byte[] trim(byte[] array, int size) {
+		byte[] newArray = new byte[size];
+		for (int i = 0; i < size; i++) {
+			newArray[i] = array[i];
+		}
+		
+		return newArray;
+	}
+	
 }
