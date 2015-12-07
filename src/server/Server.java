@@ -7,13 +7,16 @@ public class Server {
 		
 		ServerSocketConnection socket = null;
 		ServerMonitor monitor = new ServerMonitor();
-		new CameraCaptureThread("argus-1.student.lth.se", 6667, monitor).start();
+		int port = 3001;
+		new CameraCaptureThread("argus-2.student.lth.se", port, monitor).start();
 		try {
 			// Start server socket
 			socket = new ServerSocketConnection(3001, monitor);
 			InputHandler inputHandler = new InputHandler(socket, monitor);
 			socket.start();
 			inputHandler.start();
+			JPEGHTTPServer HTTPServer = new JPEGHTTPServer(6667);
+			//HTTPServer.main(null);
 		} catch (IOException e) {
 			System.err.println("Server connection failure");
 			e.printStackTrace();

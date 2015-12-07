@@ -6,21 +6,16 @@ import java.nio.ByteOrder;
 import util.Command.CMD;
 
 public class Helper {
-	
-	
+
 	public static byte[] intToByteArray(int value) {
-	    return new byte[] {
-	            (byte)(value >>> 24),
-	            (byte)(value >>> 16),
-	            (byte)(value >>> 8),
-	            (byte)value};
-	    
+		return new byte[] { (byte) (value >>> 24), (byte) (value >>> 16), (byte) (value >>> 8), (byte) value };
+
 	}
-	
+
 	public static int byteArrayToInt(byte[] array) {
 		return ByteBuffer.wrap(array).getInt();
 	}
-	
+
 	public static CMD byteToCmd(byte recvCmd) {
 		if (recvCmd == CMD.IDLE.toByte()) {
 			return CMD.IDLE;
@@ -33,6 +28,15 @@ public class Helper {
 		} else {
 			return CMD.AUTO;
 		}
-		
+	}
+
+	public static int getTimestampFromImage(byte[] imageData) {
+
+		byte[] timestamp = new byte[Constants.TIMESTAMP_SIZE];
+		for (int i = 0; i < Constants.TIMESTAMP_SIZE; i++) {
+			timestamp[i] = imageData[i];
+		}
+
+		return byteArrayToInt(timestamp);
 	}
 }

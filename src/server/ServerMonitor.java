@@ -1,8 +1,9 @@
 package server;
 
-import se.lth.cs.eda040.fakecamera.AxisM3006V;
+import se.lth.cs.eda040.proxycamera.AxisM3006V;
 import util.Command.CMD;
 import util.Constants;
+import util.Helper;
 
 public class ServerMonitor {
 	
@@ -56,7 +57,7 @@ public class ServerMonitor {
 		
 		
 		newImage = false;
-		imageUpdatedAt = System.currentTimeMillis();
+		imageUpdatedAt = Helper.getTimestampFromImage(imageData);
 		return imageData;
 	}
 	
@@ -71,6 +72,7 @@ public class ServerMonitor {
 	}
 	
 	public synchronized void setMode(CMD cmd) {
+		System.out.println("changed mode to: " + cmd);
 		mode = cmd;
 		notifyAll();
 	}
@@ -95,7 +97,11 @@ public class ServerMonitor {
 	
 	public synchronized void setMotionDetected(boolean motion) {
 		motionDetected = motion;
-		
+		if (motion) {
+			System.out.println("Motion detected!");
+		} else {
+			System.out.println("no motion detected");
+		}
 		// If sync mode is auto, set the camera to movie or idle 
 		// mode depending on if motion was detected or not
 		if (motion == true && syncMode == CMD.AUTO) {
