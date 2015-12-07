@@ -103,7 +103,7 @@ public class ClientGUI extends JFrame {
 					createNotification(CMD.SYNC + " entered");
 				}
 			}
-			
+
 		});
 		async.addItemListener(new ItemListener() {
 
@@ -114,7 +114,7 @@ public class ClientGUI extends JFrame {
 					createNotification(CMD.ASYNC + " entered");
 				}
 			}
-			
+
 		});
 		ButtonGroup syncSet = new ButtonGroup();
 		syncSet.add(sync);
@@ -139,6 +139,16 @@ public class ClientGUI extends JFrame {
 					idle.doClick();
 					createNotification(CMD.AUTO + " entered");
 				} else {
+					if (idle.isSelected()) {
+						idle.doClick();
+					} else {
+						movie.doClick();
+					}
+					if (sync.isSelected()) {
+						sync.doClick();
+					} else {
+						async.doClick();
+					}
 					sync.setEnabled(true);
 					async.setEnabled(true);
 					idle.setEnabled(true);
