@@ -1,7 +1,6 @@
 package util;
 
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 
 import util.Command.CMD;
 
@@ -17,6 +16,7 @@ public class Helper {
 	}
 
 	public static CMD byteToCmd(byte recvCmd) {
+		
 		if (recvCmd == CMD.IDLE.toByte()) {
 			return CMD.IDLE;
 		} else if (recvCmd == CMD.MOVIE.toByte()) {
@@ -25,9 +25,16 @@ public class Helper {
 			return CMD.SYNC;
 		} else if (recvCmd == CMD.ASYNC.toByte()) {
 			return CMD.ASYNC;
-		} else {
+		} else if (recvCmd == CMD.MOTION.toByte()){
+			return CMD.MOTION;
+		} else if (recvCmd == CMD.NO_MOTION.toByte()) {
+			return CMD.NO_MOTION;
+		} else if (recvCmd == CMD.MANUAL.toByte()) {
+			return CMD.MANUAL;
+		} else if (recvCmd == CMD.AUTO.toByte()) {
 			return CMD.AUTO;
 		}
+		return null;
 	}
 
 	public static int getTimestampFromImage(byte[] imageData) {

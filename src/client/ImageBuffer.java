@@ -12,7 +12,6 @@ public class ImageBuffer {
 		queue = new ArrayList<ImageFrame>();
 	}
 	
-	
 	public void put(ImageFrame image) {
 		if (queue.size() < MAX_BUFFER_SIZE) {
 			queue.add(image);

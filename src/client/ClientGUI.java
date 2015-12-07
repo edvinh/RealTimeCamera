@@ -3,16 +3,18 @@ package client;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
+import javax.imageio.ImageIO;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
@@ -35,19 +37,22 @@ public class ClientGUI extends JFrame {
 	private final JRadioButton idle, movie;
 	private JTextArea field;
 
-	public ClientGUI(ClientMonitor monitor) {
+	public ClientGUI(final ClientMonitor monitor) {
 		super();
 		this.monitor = monitor;
-		this.setMinimumSize(new Dimension(840, 640));
+		this.setPreferredSize(new Dimension(840, 640));
 		this.setTitle(TITLE);
+		this.setResizable(false);
 		this.setLayout(new BorderLayout());
 		imagePanel = new ImagePanel(monitor, this);
+		imagePanel.setVisible(true);
+		imagePanel.setPreferredSize(new Dimension(640, 480));
 		this.add(imagePanel, BorderLayout.WEST);
 
 		// Notification field
-		field = new JTextArea(Time.getCurrentTime() + ": System started \n",
-				40, 15);
+		field = new JTextArea(Time.getCurrentTime() + ": System started \n");
 		JScrollPane pane = new JScrollPane(field);
+		pane.setPreferredSize(new Dimension(180, 430));
 		this.add(pane, BorderLayout.EAST);
 		field.setEditable(false);
 		field.setVisible(true);
@@ -134,29 +139,26 @@ public class ClientGUI extends JFrame {
 					movie.setEnabled(false);
 					createNotification(CMD.AUTO + " entered");
 					monitor.setSyncMode(CMD.AUTO);
+					monitor.setMode(CMD.IDLE);
 				} else {
-					/*if (idle.isSelected()) {
-						idle.doClick();
-					} else {
-						movie.doClick();
-					}
-					if (sync.isSelected()) {
-						sync.doClick();
-					} else {
-						async.doClick();
-					}*/
-					
+					/*
+					 * if (idle.isSelected()) { idle.doClick(); } else {
+					 * movie.doClick(); } if (sync.isSelected()) {
+					 * sync.doClick(); } else { async.doClick(); }
+					 */
+
 					idle.doClick();
 					sync.doClick();
 					monitor.setSyncMode(CMD.SYNC);
 					monitor.setMode(CMD.IDLE);
+					idle.setSelected(true);
 					sync.setEnabled(true);
 					async.setEnabled(true);
 					idle.setEnabled(true);
 					movie.setEnabled(true);
+					createNotification(CMD.AUTO + " exited");
 				}
 			}
-
 		});
 
 		JPanel settings = new JPanel();
@@ -169,9 +171,10 @@ public class ClientGUI extends JFrame {
 		settings.add(delayLabel);
 		this.add(settings, BorderLayout.SOUTH);
 
-		this.setVisible(true);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.pack();
+		this.setVisible(true);
+
 	}
 
 	public void createNotification(String not) {
@@ -189,7 +192,19 @@ public class ClientGUI extends JFrame {
 	public void setMovieMode() {
 		movie.doClick();
 		movie.setSelected(true);
-
+	}
+	
+	public void updateRadioButtons(CMD mode) {
+//		System.out.println("sync mode: " + monitor.getSyncMode() + " recv mode: " + mode);
+		if (monitor.getSyncMode() == CMD.AUTO) {
+			if (mode == CMD.MOTION) {
+				movie.setSelected(true);
+				idle.setSelected(false);
+			} else {
+				idle.setSelected(true);
+				movie.setSelected(false);
+			}
+		}
 	}
 
 }
@@ -199,6 +214,7 @@ class ImagePanel extends JPanel {
 	ImageIcon icon;
 	ClientMonitor monitor;
 	ClientGUI gui;
+	Image theImage;
 
 	ImagePanel(ClientMonitor monitor, ClientGUI gui) {
 		super();
@@ -219,15 +235,14 @@ class ImagePanel extends JPanel {
 		// System.out.println("ClientGUI: Refreshing... Timestamp: "
 		// + image.getTimestamp() + " image size: " + image.getImage().length);
 
-		Image theImage = getToolkit().createImage(image.getImage());
+		theImage = getToolkit().createImage(image.getImage());
 		getToolkit().prepareImage(theImage, -1, -1, null);
 		icon.setImage(theImage);
 		icon.paintIcon(this, this.getGraphics(), 5, 5);
 		double delay = System.currentTimeMillis() - image.getTimestamp();
 		gui.updateDelay(delay);
-		
+		gui.updateRadioButtons(image.getMode());
 	}
-
 }
 
 class Time {

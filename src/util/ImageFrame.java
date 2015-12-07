@@ -47,8 +47,6 @@ public class ImageFrame {
 			total = new byte[IMAGE_PACKAGE_SIZE + timestamp.length + image.length + MODE_SIZE];
 			byte[] imgSize = Helper.intToByteArray(image.length);
 			
-			int fromBytes = Helper.byteArrayToInt(imgSize);
-			
 			for (int i = 0; i < IMAGE_PACKAGE_SIZE; i++) {
 				total[i] = imgSize[i];
 			}

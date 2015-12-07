@@ -37,17 +37,17 @@ public class ServerMonitor {
 		}
 		
 		
-		long waitUntil = imageUpdatedAt + imageWaitPeriod; 
+		long waitUntil = imageUpdatedAt + imageWaitPeriod;
 		
 		long timeLeft = waitUntil - System.currentTimeMillis();
 		
 		
 		while (timeLeft > 0) {
-			System.out.println("timeLeft: " + timeLeft);
+			//System.out.println("timeLeft: " + timeLeft);
 			try {
 				
 				// If mode is auto and motion was detected, cancel the wait
-				if (motionDetected() && syncMode == CMD.AUTO && mode == CMD.IDLE) {
+				if (motionDetected() && syncMode == CMD.AUTO || mode == CMD.MOVIE) {
 					waitUntil = 0;
 				}
 				wait();
@@ -57,7 +57,7 @@ public class ServerMonitor {
 		
 		
 		newImage = false;
-		imageUpdatedAt = Helper.getTimestampFromImage(imageData);
+		imageUpdatedAt = System.currentTimeMillis();
 		return imageData;
 	}
 	
@@ -72,13 +72,13 @@ public class ServerMonitor {
 	}
 	
 	public synchronized void setMode(CMD cmd) {
-		System.out.println("changed mode to: " + cmd);
+		//System.out.println("changed mode to: " + cmd);
 		mode = cmd;
 		notifyAll();
 	}
 	
 	public synchronized void setSyncMode(CMD cmd) {
-		System.out.println("syncmode set: " + cmd.toString());
+		//System.out.println("syncmode set: " + cmd.toString());
 		syncMode = cmd;
 		notifyAll();
 	}
@@ -98,9 +98,9 @@ public class ServerMonitor {
 	
 	public synchronized void setMotionDetected(boolean motion) {
 		motionDetected = motion;
-//		if (motion) {
-//			System.out.println("Motion detected!");
-//		} else {
+		if (motion) {
+			//System.out.println("Motion detected!");
+		} //else {
 //			System.out.println("no motion detected");
 //		}
 		
@@ -108,10 +108,10 @@ public class ServerMonitor {
 		// mode depending on if motion was detected or not
 		if (motion == true && syncMode == CMD.AUTO) {
 			mode = CMD.MOVIE;
-			System.out.println("mode set to movie in motiondetected, sync: " + syncMode.toString());
+			//System.out.println("mode set to movie in motiondetected, sync: " + syncMode.toString());
 		} else if (motion == false && syncMode == CMD.AUTO) {
 			mode = CMD.IDLE;
-			System.out.println("mode set to idle in motiondetected, sync: " + syncMode.toString());
+			//System.out.println("mode set to idle in motiondetected, sync: " + syncMode.toString());
 		}
 		
 		notifyAll();

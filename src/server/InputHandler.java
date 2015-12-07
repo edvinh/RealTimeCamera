@@ -17,14 +17,13 @@ public class InputHandler extends Thread {
 		byte[] data = new byte[Command.LENGTH];
 		while (true) {
 			try {
-				//System.out.println("Reading...");
 				socket.read(data);
 				// Get the command
 				byte bCmd = data[0];
 				CMD cmd = Helper.byteToCmd(bCmd);
-				
-				if (cmd == CMD.MOVIE || cmd == cmd.IDLE) {
-					monitor.setMode(cmd);	
+				System.out.println("read cmd: " + cmd);
+				if (cmd == CMD.MOVIE || cmd == CMD.IDLE) {
+					monitor.setMode(cmd);
 				} else {
 					monitor.setSyncMode(cmd);
 				}

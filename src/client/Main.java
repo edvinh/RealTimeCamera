@@ -18,9 +18,7 @@ public class Main {
 			ClientOutput clientOutput = new ClientOutput(socket, monitor);
 			clientOutput.start();
 		} catch (IOException e) {
-			System.err.println("Unable connect to port");
 			
-			e.printStackTrace();
 		}
 
 		SwingUtilities.invokeLater(new Runnable() {

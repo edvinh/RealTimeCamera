@@ -78,6 +78,7 @@ public class ClientMonitor {
 	}
 	
 	public synchronized boolean syncModeChanged() {
+		System.out.println("sync mode changed");
 		while (!syncModeChanged) {
 			try {
 				wait();
@@ -90,6 +91,7 @@ public class ClientMonitor {
 	}
 	
 	public synchronized boolean modeChanged() {
+		System.out.println("mode changed");
 		while (!modeChanged) {
 			try {
 				wait();

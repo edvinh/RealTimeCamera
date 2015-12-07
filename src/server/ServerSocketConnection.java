@@ -47,7 +47,6 @@ public class ServerSocketConnection extends Thread {
 		int read = 0;
 		while (read < Command.LENGTH) {
 			int n = is.read(data, read, Command.LENGTH - read); // Blocking
-			System.out.println("read: " + n);
 			if (n == -1)
 				throw new IOException();
 			read += n;
