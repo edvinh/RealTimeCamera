@@ -109,10 +109,12 @@ public class ServerMonitor {
 		if (motion == true && syncMode == CMD.AUTO) {
 			mode = CMD.MOVIE;
 			//System.out.println("mode set to movie in motiondetected, sync: " + syncMode.toString());
-		} else if (motion == false && syncMode == CMD.AUTO) {
+		} 
+		// Returns to idle mode when in auto and no motion is detected anymore.
+		/*else if (motion == false && syncMode == CMD.AUTO) {
 			mode = CMD.IDLE;
 			//System.out.println("mode set to idle in motiondetected, sync: " + syncMode.toString());
-		}
+		}*/
 		
 		notifyAll();
 	}

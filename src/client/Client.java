@@ -45,7 +45,6 @@ public class Client {
 		clientOutput2.start();
 		final ClientMonitor[] monitors = { monitor1, monitor2 };
 		SwingUtilities.invokeLater(new Runnable() {
-			@Override
 			public void run() {
 				gui = new ClientGUI(monitors, 2);
 				ImageDispatcher imageDispatcher = new ImageDispatcher(monitors, gui.getImagePanel());

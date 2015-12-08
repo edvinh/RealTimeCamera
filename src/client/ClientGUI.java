@@ -9,12 +9,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-import javax.imageio.ImageIO;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
@@ -24,6 +21,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.SwingConstants;
 
 import util.Command.CMD;
 import util.ImageFrame;
@@ -33,9 +31,13 @@ public class ClientGUI extends JFrame {
 	protected ClientMonitor[] monitors;
 	private static final long serialVersionUID = 1L;
 	private ImagePanel[] imagePanels;
-	// private JLabel delayLabel;
 	private final JRadioButton idle, movie;
 	private JTextArea field;
+	private JRadioButton sync, async;
+	private JLabel[] delays;
+
+	// Checks if the previous image was synced or not.
+	private boolean oldImageSync = true;
 
 	public ClientGUI(final ClientMonitor[] monitors, int nbrOfServers) {
 		super();
@@ -78,7 +80,6 @@ public class ClientGUI extends JFrame {
 		movie.setEnabled(false);
 		idle.addItemListener(new ItemListener() {
 
-			@Override
 			public void itemStateChanged(ItemEvent e) {
 				if (e.getStateChange() == ItemEvent.SELECTED) {
 					monitors[0].setMode(CMD.IDLE);
@@ -90,7 +91,6 @@ public class ClientGUI extends JFrame {
 		});
 		movie.addItemListener(new ItemListener() {
 
-			@Override
 			public void itemStateChanged(ItemEvent e) {
 				if (e.getStateChange() == ItemEvent.SELECTED) {
 					monitors[0].setMode(CMD.MOVIE);
@@ -104,26 +104,25 @@ public class ClientGUI extends JFrame {
 		modes.add(movie);
 
 		// Buttons for synchronized and asynchronized
-		final JRadioButton sync = new JRadioButton("Synchronous", true);
-		final JRadioButton async = new JRadioButton("Asynchronous", false);
+		sync = new JRadioButton("Synchronous", true);
+		async = new JRadioButton("Asynchronous", false);
 		sync.setMnemonic(KeyEvent.VK_S);
 		async.setMnemonic(KeyEvent.VK_X);
 		sync.setEnabled(false);
 		async.setEnabled(false);
 		sync.addItemListener(new ItemListener() {
 
-			@Override
 			public void itemStateChanged(ItemEvent e) {
 				if (e.getStateChange() == ItemEvent.SELECTED) {
 					monitors[0].setSyncMode(CMD.SYNC);
 					monitors[1].setSyncMode(CMD.SYNC);
+
 					createNotification(CMD.SYNC + " entered");
 				}
 			}
 		});
 		async.addItemListener(new ItemListener() {
 
-			@Override
 			public void itemStateChanged(ItemEvent e) {
 				if (e.getStateChange() == ItemEvent.SELECTED) {
 					monitors[0].setSyncMode(CMD.ASYNC);
@@ -144,7 +143,6 @@ public class ClientGUI extends JFrame {
 		auto.setMnemonic(KeyEvent.VK_A);
 		auto.addActionListener(new ActionListener() {
 			// This is the itemlistener for the auto button
-			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (auto.isSelected()) {
 					sync.setEnabled(false);
@@ -157,11 +155,6 @@ public class ClientGUI extends JFrame {
 					monitors[1].setSyncMode(CMD.AUTO);
 					monitors[1].setMode(CMD.IDLE);
 				} else {
-					/*
-					 * if (idle.isSelected()) { idle.doClick(); } else {
-					 * movie.doClick(); } if (sync.isSelected()) {
-					 * sync.doClick(); } else { async.doClick(); }
-					 */
 
 					idle.doClick();
 					sync.doClick();
@@ -178,7 +171,6 @@ public class ClientGUI extends JFrame {
 				}
 			}
 		});
-
 		JPanel settings = new JPanel();
 		settings.setLayout(new FlowLayout());
 		settings.add(auto);
@@ -186,7 +178,14 @@ public class ClientGUI extends JFrame {
 		settings.add(movie);
 		settings.add(sync);
 		settings.add(async);
-		// settings.add(delayLabel);
+
+		// Delay labels
+		delays = new JLabel[nbrOfServers];
+		for (int i = 0; i < nbrOfServers; i++) {
+			delays[i] = new JLabel("Camera Delay #" + (i + 1) + ": 0 ms");
+			settings.add(delays[i]);
+		}
+
 		this.add(settings, BorderLayout.SOUTH);
 
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -203,30 +202,53 @@ public class ClientGUI extends JFrame {
 		return imagePanels;
 	}
 
-	// public void updateDelay(double delay) {
-	// delayLabel.setText("Delay: " + Double.toString(delay) + " ms");
-	// }
+	public void updateDelay() {
+		for (int i = 0; i < imagePanels.length; i++) {
+			String delay = Long.toString(imagePanels[i].delay);
+			delays[i].setText("Camera #" + (i + 1) + " Delay: " + delay);
+		}
+	}
 
 	public void setMovieMode() {
 		movie.doClick();
 		movie.setSelected(true);
 	}
 
+	/* Update the radio buttons, mode for IDLE/MOVIE, syncMode for ASYNC/SYNC */
 	public void updateRadioButtons(CMD mode) {
-		// System.out.println("sync mode: " + monitor.getSyncMode() +
-		// " recv mode: " + mode);
-		if (monitors[0].getSyncMode() == CMD.AUTO
-				|| monitors[1].getSyncMode() == CMD.AUTO) {
+
+		/*
+		 * if (monitors[0].getSyncMode() == CMD.AUTO ||
+		 * monitors[1].getSyncMode() == CMD.AUTO) { if (mode == CMD.MOTION) {
+		 * movie.setSelected(true); idle.setSelected(false); } else {
+		 * idle.setSelected(true); movie.setSelected(false); } }
+		 */
+		
+		/*
+		boolean isAuto = monitors[0].getSyncMode() == CMD.AUTO;
+		if (isAuto) {
+			if (syncedImage) {
+				//sync.setSelected(true);
+				if (oldImageSync != syncedImage) {
+					createNotification(CMD.SYNC + " enabled");
+				}
+			} else {
+				//async.setSelected(true);
+				if (oldImageSync != syncedImage) {
+					createNotification(CMD.ASYNC + " enabled");
+				}
+			}
+		}
+		oldImageSync = syncedImage;
+		*/
+		
+		if (monitors[0].getSyncMode() == CMD.AUTO) {
 			if (mode == CMD.MOTION) {
 				movie.setSelected(true);
 				idle.setSelected(false);
-			} else {
-				idle.setSelected(true);
-				movie.setSelected(false);
 			}
 		}
 	}
-
 }
 
 class ImagePanel extends JPanel {
@@ -235,43 +257,44 @@ class ImagePanel extends JPanel {
 	ClientMonitor monitor;
 	ClientGUI gui;
 	Image theImage;
-	JLabel delayLabel;
+	JLabel imageLabel;
+	long delay;
 
 	ImagePanel(ClientMonitor monitor, ClientGUI gui) {
 		super();
 		this.gui = gui;
 		this.monitor = monitor;
 		icon = new ImageIcon();
-		JLabel label = new JLabel(icon);
-		this.setMinimumSize(new Dimension(640, 480));
-		add(label, BorderLayout.NORTH);
-		delayLabel = new JLabel("Delay: 0 ms");
-		delayLabel.setVisible(true);
-		add(delayLabel, BorderLayout.SOUTH);
+		delay = 0;
+		imageLabel = new JLabel(icon);
+		this.setPreferredSize(new Dimension(640, 480));
+		add(imageLabel, BorderLayout.NORTH);
 	}
 
+	/**
+	 * Refreshes the panel with a new image. <b>syncedImage</b> determines if
+	 * the image was updated in synchronized mode or not.
+	 * 
+	 * @param image
+	 *            The image
+	 * @param syncedImage
+	 *            true if image was updated in synchronized mode, else false.
+	 * 
+	 */
 	public void refresh(ImageFrame image) {
 		if (image == null) {
 			System.out.println("ClientGUI - received null image");
 			return;
 		}
 
-		// System.out.println("ClientGUI: Refreshing... Timestamp: "
-		// + image.getTimestamp() + " image size: " + image.getImage().length);
-
 		theImage = getToolkit().createImage(image.getImage());
 		getToolkit().prepareImage(theImage, -1, -1, null);
 		icon.setImage(theImage);
 		icon.paintIcon(this, this.getGraphics(), 5, 5);
-		double delay = System.currentTimeMillis() - image.getTimestamp();
-		delayLabel.setText("Delay: " + delay + " ms");
+		delay = System.currentTimeMillis() - image.getTimestamp();
 		gui.updateRadioButtons(image.getMode());
+		gui.updateDelay();
 	}
-
-	public double getDelay() {
-		return Double.parseDouble(delayLabel.getText());
-	}
-
 }
 
 class Time {

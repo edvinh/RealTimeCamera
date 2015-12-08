@@ -36,14 +36,4 @@ public class Helper {
 		}
 		return null;
 	}
-
-	public static int getTimestampFromImage(byte[] imageData) {
-
-		byte[] timestamp = new byte[Constants.TIMESTAMP_SIZE];
-		for (int i = 0; i < Constants.TIMESTAMP_SIZE; i++) {
-			timestamp[i] = imageData[i];
-		}
-
-		return byteArrayToInt(timestamp);
-	}
 }
