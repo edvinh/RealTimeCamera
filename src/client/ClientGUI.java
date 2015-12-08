@@ -30,24 +30,34 @@ import util.ImageFrame;
 
 public class ClientGUI extends JFrame {
 	public static final String TITLE = "Real-Time Camera System";
-	protected ClientMonitor monitor;
+	protected ClientMonitor[] monitors;
 	private static final long serialVersionUID = 1L;
-	private ImagePanel imagePanel;
-	private JLabel delayLabel;
+	private ImagePanel[] imagePanels;
+	// private JLabel delayLabel;
 	private final JRadioButton idle, movie;
 	private JTextArea field;
 
-	public ClientGUI(final ClientMonitor monitor) {
+	public ClientGUI(final ClientMonitor[] monitors, int nbrOfServers) {
 		super();
-		this.monitor = monitor;
-		this.setPreferredSize(new Dimension(840, 640));
+		this.monitors = monitors;
+		this.setPreferredSize(new Dimension(nbrOfServers * 840 - 170, 640));
 		this.setTitle(TITLE);
 		this.setResizable(false);
 		this.setLayout(new BorderLayout());
-		imagePanel = new ImagePanel(monitor, this);
-		imagePanel.setVisible(true);
-		imagePanel.setPreferredSize(new Dimension(640, 480));
-		this.add(imagePanel, BorderLayout.WEST);
+		imagePanels = new ImagePanel[nbrOfServers];
+
+		// ImagePanel settings
+		JPanel imageHolder = new JPanel();
+
+		for (int i = 0; i < nbrOfServers; i++) {
+			ImagePanel im = new ImagePanel(monitors[i], this);
+			im.setVisible(true);
+			im.setPreferredSize(new Dimension(640, 480));
+			imageHolder.add(im);
+			imagePanels[i] = im;
+		}
+
+		this.add(imageHolder, BorderLayout.WEST);
 
 		// Notification field
 		field = new JTextArea(Time.getCurrentTime() + ": System started \n");
@@ -71,7 +81,8 @@ public class ClientGUI extends JFrame {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
 				if (e.getStateChange() == ItemEvent.SELECTED) {
-					monitor.setMode(CMD.IDLE);
+					monitors[0].setMode(CMD.IDLE);
+					monitors[1].setMode(CMD.IDLE);
 					createNotification(CMD.IDLE + " entered");
 				}
 			}
@@ -82,7 +93,8 @@ public class ClientGUI extends JFrame {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
 				if (e.getStateChange() == ItemEvent.SELECTED) {
-					monitor.setMode(CMD.MOVIE);
+					monitors[0].setMode(CMD.MOVIE);
+					monitors[1].setMode(CMD.MOVIE);
 					createNotification(CMD.MOVIE + " entered");
 				}
 			}
@@ -103,7 +115,8 @@ public class ClientGUI extends JFrame {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
 				if (e.getStateChange() == ItemEvent.SELECTED) {
-					monitor.setSyncMode(CMD.SYNC);
+					monitors[0].setSyncMode(CMD.SYNC);
+					monitors[1].setSyncMode(CMD.SYNC);
 					createNotification(CMD.SYNC + " entered");
 				}
 			}
@@ -113,7 +126,8 @@ public class ClientGUI extends JFrame {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
 				if (e.getStateChange() == ItemEvent.SELECTED) {
-					monitor.setSyncMode(CMD.ASYNC);
+					monitors[0].setSyncMode(CMD.ASYNC);
+					monitors[1].setSyncMode(CMD.ASYNC);
 					createNotification(CMD.ASYNC + " entered");
 				}
 			}
@@ -123,7 +137,7 @@ public class ClientGUI extends JFrame {
 		syncSet.add(async);
 
 		// Label for displaying the current delay
-		delayLabel = new JLabel("Delay: 0 ms");
+		// delayLabel = new JLabel("Delay: 0 ms");
 
 		// Auto button
 		final JCheckBox auto = new JCheckBox("Auto", true);
@@ -138,8 +152,10 @@ public class ClientGUI extends JFrame {
 					idle.setEnabled(false);
 					movie.setEnabled(false);
 					createNotification(CMD.AUTO + " entered");
-					monitor.setSyncMode(CMD.AUTO);
-					monitor.setMode(CMD.IDLE);
+					monitors[0].setSyncMode(CMD.AUTO);
+					monitors[0].setMode(CMD.IDLE);
+					monitors[1].setSyncMode(CMD.AUTO);
+					monitors[1].setMode(CMD.IDLE);
 				} else {
 					/*
 					 * if (idle.isSelected()) { idle.doClick(); } else {
@@ -149,8 +165,10 @@ public class ClientGUI extends JFrame {
 
 					idle.doClick();
 					sync.doClick();
-					monitor.setSyncMode(CMD.SYNC);
-					monitor.setMode(CMD.IDLE);
+					monitors[0].setSyncMode(CMD.SYNC);
+					monitors[0].setMode(CMD.IDLE);
+					monitors[1].setSyncMode(CMD.SYNC);
+					monitors[1].setMode(CMD.IDLE);
 					idle.setSelected(true);
 					sync.setEnabled(true);
 					async.setEnabled(true);
@@ -168,7 +186,7 @@ public class ClientGUI extends JFrame {
 		settings.add(movie);
 		settings.add(sync);
 		settings.add(async);
-		settings.add(delayLabel);
+		// settings.add(delayLabel);
 		this.add(settings, BorderLayout.SOUTH);
 
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -181,22 +199,24 @@ public class ClientGUI extends JFrame {
 		field.append(Time.getCurrentTime() + ": " + not + "\n");
 	}
 
-	public ImagePanel getImagePanel() {
-		return imagePanel;
+	public ImagePanel[] getImagePanel() {
+		return imagePanels;
 	}
 
-	public void updateDelay(double delay) {
-		delayLabel.setText("Delay: " + Double.toString(delay) + " ms");
-	}
+	// public void updateDelay(double delay) {
+	// delayLabel.setText("Delay: " + Double.toString(delay) + " ms");
+	// }
 
 	public void setMovieMode() {
 		movie.doClick();
 		movie.setSelected(true);
 	}
-	
+
 	public void updateRadioButtons(CMD mode) {
-//		System.out.println("sync mode: " + monitor.getSyncMode() + " recv mode: " + mode);
-		if (monitor.getSyncMode() == CMD.AUTO) {
+		// System.out.println("sync mode: " + monitor.getSyncMode() +
+		// " recv mode: " + mode);
+		if (monitors[0].getSyncMode() == CMD.AUTO
+				|| monitors[1].getSyncMode() == CMD.AUTO) {
 			if (mode == CMD.MOTION) {
 				movie.setSelected(true);
 				idle.setSelected(false);
@@ -215,6 +235,7 @@ class ImagePanel extends JPanel {
 	ClientMonitor monitor;
 	ClientGUI gui;
 	Image theImage;
+	JLabel delayLabel;
 
 	ImagePanel(ClientMonitor monitor, ClientGUI gui) {
 		super();
@@ -224,6 +245,9 @@ class ImagePanel extends JPanel {
 		JLabel label = new JLabel(icon);
 		this.setMinimumSize(new Dimension(640, 480));
 		add(label, BorderLayout.NORTH);
+		delayLabel = new JLabel("Delay: 0 ms");
+		delayLabel.setVisible(true);
+		add(delayLabel, BorderLayout.SOUTH);
 	}
 
 	public void refresh(ImageFrame image) {
@@ -240,9 +264,14 @@ class ImagePanel extends JPanel {
 		icon.setImage(theImage);
 		icon.paintIcon(this, this.getGraphics(), 5, 5);
 		double delay = System.currentTimeMillis() - image.getTimestamp();
-		gui.updateDelay(delay);
+		delayLabel.setText("Delay: " + delay + " ms");
 		gui.updateRadioButtons(image.getMode());
 	}
+
+	public double getDelay() {
+		return Double.parseDouble(delayLabel.getText());
+	}
+
 }
 
 class Time {

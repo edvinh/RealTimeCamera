@@ -3,27 +3,45 @@ package server;
 import java.io.IOException;
 
 public class Server {
+	
+	
 	public static void main(String[] args) {
-		
-		ServerSocketConnection socket = null;
-		ServerMonitor monitor = new ServerMonitor();
-		int port = 3001;
-		new CameraCaptureThread("argus-1.student.lth.se", port, monitor).start();
+		new Server("argus-5.student.lth.se", 3001, 3001).start();
+		new Server("argus-7.student.lth.se", 3001, 3002).start();
+	}
+	
+	private ServerSocketConnection socket;
+	private ServerMonitor monitor;
+	private CameraCaptureThread ccThread;
+	private InputHandler inputHandler;
+	
+	/**
+	 * Creates a new server. 
+	 * @param cameraAddress the camera URL
+	 * @param cameraPort the camera port
+	 * @param port the port the server will emit/listen on
+	 */
+	public Server(String cameraAddress, int cameraPort, int port) {
+		monitor = new ServerMonitor();
+		ccThread = new CameraCaptureThread(cameraAddress, cameraPort, monitor);
 		try {
-			// Start server socket
-			socket = new ServerSocketConnection(3001, monitor);
-			InputHandler inputHandler = new InputHandler(socket, monitor);
-			socket.start();
-			inputHandler.start();
-			//JPEGHTTPServer HTTPServer = new JPEGHTTPServer(6667);
-			//HTTPServer.main(null);
+			socket = new ServerSocketConnection(port, monitor);
 		} catch (IOException e) {
-			System.err.println("Server connection failure");
+			System.err.println("Server conection failure");
 			e.printStackTrace();
 		}
 		
+		inputHandler = new InputHandler(socket, monitor);
+	}
+	
+	/**
+	 * Starts the server.
+	 */
+	public void start() {
+		ccThread.start();
+		socket.start();
+		inputHandler.start();
 		System.out.println("Server listening...");
-		
 	}
 
 }

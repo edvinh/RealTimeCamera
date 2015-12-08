@@ -100,5 +100,5 @@ public class ImageFrame {
 /*                         IMAGE PROTOCOL
  *     4 bytes      8 bytes     1 byte       variable bytes
  *  _____________________________________________________________
- * |_image size_|__timestamp__|__mode__|__________IMAGE__________|
+ * |_image_size_|__timestamp__|__mode__|__________IMAGE__________|
  */

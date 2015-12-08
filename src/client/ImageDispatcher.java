@@ -6,23 +6,30 @@ import util.ImageFrame;
 
 public class ImageDispatcher extends Thread {
 	
-	private ClientMonitor monitor;
-	private ImagePanel panel;
-	public ImageDispatcher(ClientMonitor monitor, ImagePanel panel) {
-		this.monitor = monitor;
-		this.panel = panel;
+	private ClientMonitor[] monitors;
+	private ImagePanel[] panels;
+	public ImageDispatcher(ClientMonitor[] monitors, ImagePanel[] panels) {
+		this.monitors = monitors;
+		this.panels = panels;
 	}
 	
 	public void run() {
 		while (true) {
-			//System.out.println("imageDispatcher running...");
-			final ImageFrame image = monitor.getImage();
-			//System.out.println("image length:" + image.getImage().length);
-			if (image != null && image.getImage() != null) {
+			
+			final ImageFrame images[] = { monitors[0].getImage(), monitors[1].getImage() };
+			
+			if (images[0] != null && images[0].getImage() != null) {
 				SwingUtilities.invokeLater(new Runnable () {
 					public void run () {
-						//System.out.println("refreshing image: " + image.getImage().length);
-						panel.refresh(image);
+						panels[0].refresh(images[0]);
+					}
+				});
+			}
+			
+			if (images[1] != null && images[1].getImage() != null) {
+				SwingUtilities.invokeLater(new Runnable () {
+					public void run () {
+						panels[1].refresh(images[1]);
 					}
 				});
 			}
