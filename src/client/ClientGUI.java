@@ -39,9 +39,11 @@ public class ClientGUI extends JFrame {
 	// Checks if the previous image was synced or not.
 	private boolean oldImageSync = true;
 
-	public ClientGUI(final ClientMonitor[] monitors, int nbrOfServers) {
+	public ClientGUI(ClientMonitor monitor1, ClientMonitor monitor2, int nbrOfServers) {
 		super();
-		this.monitors = monitors;
+		monitors = new ClientMonitor[nbrOfServers];
+		monitors[0] = monitor1;
+		monitors[1] = monitor2;
 		this.setPreferredSize(new Dimension(nbrOfServers * 840 - 170, 640));
 		this.setTitle(TITLE);
 		this.setResizable(false);
@@ -116,7 +118,6 @@ public class ClientGUI extends JFrame {
 				if (e.getStateChange() == ItemEvent.SELECTED) {
 					monitors[0].setSyncMode(CMD.SYNC);
 					monitors[1].setSyncMode(CMD.SYNC);
-
 					createNotification(CMD.SYNC + " entered");
 				}
 			}
@@ -150,10 +151,10 @@ public class ClientGUI extends JFrame {
 					idle.setEnabled(false);
 					movie.setEnabled(false);
 					createNotification(CMD.AUTO + " entered");
-					monitors[0].setSyncMode(CMD.AUTO);
 					monitors[0].setMode(CMD.IDLE);
-					monitors[1].setSyncMode(CMD.AUTO);
+					monitors[0].setSyncMode(CMD.AUTO);
 					monitors[1].setMode(CMD.IDLE);
+					monitors[1].setSyncMode(CMD.AUTO);
 				} else {
 
 					idle.doClick();
@@ -198,7 +199,7 @@ public class ClientGUI extends JFrame {
 		field.append(Time.getCurrentTime() + ": " + not + "\n");
 	}
 
-	public ImagePanel[] getImagePanel() {
+	public ImagePanel[] getImagePanels() {
 		return imagePanels;
 	}
 
@@ -209,39 +210,8 @@ public class ClientGUI extends JFrame {
 		}
 	}
 
-	public void setMovieMode() {
-		movie.doClick();
-		movie.setSelected(true);
-	}
-
 	/* Update the radio buttons, mode for IDLE/MOVIE, syncMode for ASYNC/SYNC */
 	public void updateRadioButtons(CMD mode) {
-
-		/*
-		 * if (monitors[0].getSyncMode() == CMD.AUTO ||
-		 * monitors[1].getSyncMode() == CMD.AUTO) { if (mode == CMD.MOTION) {
-		 * movie.setSelected(true); idle.setSelected(false); } else {
-		 * idle.setSelected(true); movie.setSelected(false); } }
-		 */
-		
-		/*
-		boolean isAuto = monitors[0].getSyncMode() == CMD.AUTO;
-		if (isAuto) {
-			if (syncedImage) {
-				//sync.setSelected(true);
-				if (oldImageSync != syncedImage) {
-					createNotification(CMD.SYNC + " enabled");
-				}
-			} else {
-				//async.setSelected(true);
-				if (oldImageSync != syncedImage) {
-					createNotification(CMD.ASYNC + " enabled");
-				}
-			}
-		}
-		oldImageSync = syncedImage;
-		*/
-		
 		if (monitors[0].getSyncMode() == CMD.AUTO) {
 			if (mode == CMD.MOTION) {
 				movie.setSelected(true);

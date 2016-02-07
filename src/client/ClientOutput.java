@@ -17,23 +17,21 @@ public class ClientOutput extends Thread {
 	 */
 	public void run() {
 		while (!interrupted()) {
-			if (/*monitor.modeChanged()*/ true) {
-				try {
-					socket.writeCmd(monitor.getMode());
-					//System.out.println("sent mode change to server: " + monitor.getMode());
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+			try {
+				socket.writeCmd(monitor.getMode());
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
-			
-			if (/*monitor.syncModeChanged()*/ true) {
-				try {
-					socket.writeCmd(monitor.getSyncMode());
-					//System.out.println("sent sync mode change to server: " + monitor.getSyncMode());
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
+
+//			if (/* monitor.syncModeChanged() */ true) {
+//				try {
+//					socket.writeCmd(monitor.getSyncMode());
+//					// System.out.println("sent sync mode change to server: " +
+//					// monitor.getSyncMode());
+//				} catch (IOException e) {
+//					e.printStackTrace();
+//				}
+//			}
 		}
 	}
 }

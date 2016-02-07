@@ -43,11 +43,10 @@ public class Client {
 		clientOutput1.start();
 		socket2.start();
 		clientOutput2.start();
-		final ClientMonitor[] monitors = { monitor1, monitor2 };
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				gui = new ClientGUI(monitors, 2);
-				ImageDispatcher imageDispatcher = new ImageDispatcher(monitors, gui.getImagePanel());
+				gui = new ClientGUI(monitor1, monitor2, 2);
+				ImageDispatcher imageDispatcher = new ImageDispatcher(monitor1, monitor2, gui.getImagePanels());
 				imageDispatcher.start();
 			}
 		});

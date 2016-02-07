@@ -1,6 +1,5 @@
 package util;
 
-import se.lth.cs.eda040.fakecamera.AxisM3006V;
 import util.Command.CMD;
 
 public class ImageFrame {

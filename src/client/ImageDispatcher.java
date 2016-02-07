@@ -1,88 +1,60 @@
 package client;
 
-import javax.swing.SwingUtilities;
-
 import util.Command.CMD;
 import util.Constants;
 import util.ImageFrame;
 
 public class ImageDispatcher extends Thread {
 
-	private ClientMonitor[] monitors;
+	private ClientMonitor monitor1, monitor2;
 	private ImagePanel[] panels;
 
-	public ImageDispatcher(ClientMonitor[] monitors, ImagePanel[] panels) {
-		this.monitors = monitors;
+	public ImageDispatcher(ClientMonitor monitor1, ClientMonitor monitor2, ImagePanel[] panels) {
+		this.monitor1 = monitor1;
+		this.monitor2 = monitor2;
 		this.panels = panels;
 	}
 
 	public void run() {
 		while (true) {
+			ImageFrame im1 = monitor1.getImage();
+			ImageFrame im2 = monitor2.getImage();
+			long im1Stamp = im1.getTimestamp();
+			long im2Stamp = im2.getTimestamp();
 			
-			final ImageFrame images[] = { monitors[0].getImage(), monitors[1].getImage() };
+			//Set Idle
 			
-			/*boolean synced = false;
-			int firstImageWait = 0;
-			int secondImageWait = 0;
-			CMD syncMode = monitors[0].getSyncMode();
-			boolean isAuto = (syncMode == CMD.AUTO);
 			
-			if (isAuto || syncMode == CMD.SYNC) {
-				
-				long diff = Math.abs(images[0].getTimestamp() - images[1].getTimestamp());
-				
-				if (diff < Constants.SYNC_THRESHOLD || syncMode == CMD.SYNC) {
-					synced = true;
-
-					if (images[0].getTimestamp() > images[1].getTimestamp()) {
-						secondImageWait = (int) diff;
-					} else {
-						firstImageWait = (int) diff;
-					}
-					System.out.println("syncing, ttw: " + diff + " synced: " + synced);
+			// Check sync threshold
+			long diff = Math.abs(im1Stamp - im2Stamp);
+			if ((diff > Constants.SYNC_THRESHOLD && monitor1.getAutoMode() == CMD.AUTO)
+					|| (monitor1.getAutoMode() != CMD.AUTO && monitor1.getSyncMode() == CMD.ASYNC)) {
+				monitor1.setSyncMode(CMD.ASYNC);
+				monitor2.setSyncMode(CMD.ASYNC);
+				panels[0].refresh(im1);
+				panels[1].refresh(im2);
+			} else {
+				ImageFrame toWait, toSend;
+				int panelToWait, panelToSend;
+				long latestStamp = Math.max(im1Stamp, im2Stamp);
+				if (im1Stamp == latestStamp) {
+					toWait = im1;
+					toSend = im2;
+					panelToWait = 0;
+					panelToSend = 1;
 				} else {
-					System.out.println("not sync mode or threshold too large, ttw: " + diff + " synced: " + synced);
+					toWait = im2;
+					toSend = im1;
+					panelToWait = 1;
+					panelToSend = 0;
 				}
-			}
-			
-			// lol :))))))))))))))))))
-			final int finalFirstWait = firstImageWait;
-			final int finalSecondWait = secondImageWait;
-			final boolean finalSynced = synced;
-			*/
-			if (images[0] != null && images[0].getImage() != null) {
-				SwingUtilities.invokeLater(new Runnable() {
-					public void run() {
-						/*if (finalSynced) {
-							try {
-								Thread.sleep(finalFirstWait);
-							} catch (InterruptedException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-						}*/
-						//System.out.println("panel 1 refreshed at: " + System.currentTimeMillis());
-						panels[0].refresh(images[0]);
-					}
-				});
-			}
-
-			if (images[1] != null && images[1].getImage() != null) {
-				SwingUtilities.invokeLater(new Runnable() {
-					public void run() {
-						/*if (finalSynced) {
-							try {
-								Thread.sleep(finalSecondWait);
-							} catch (InterruptedException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-						}
-						*/
-						//System.out.println("panel 2 refreshed at: " + System.currentTimeMillis() + " finalSynced: " + finalSynced);
-						panels[1].refresh(images[1]);
-					}
-				});
+				panels[panelToSend].refresh(toSend);
+				try {
+					Thread.sleep(diff);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				panels[panelToWait].refresh(toWait);
 			}
 		}
 	}

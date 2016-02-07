@@ -15,30 +15,25 @@ public class ServerSocketConnection extends Thread {
 	OutputStream os;
 	ServerSocket ss;
 	ServerMonitor monitor;
+
 	public ServerSocketConnection(int port, ServerMonitor monitor) throws IOException {
 		ss = new ServerSocket(port);
 		this.monitor = monitor;
 	}
 
-	
-	
 	public void run() {
 		try {
 			Socket s = ss.accept();
 			s.setTcpNoDelay(true);
 			is = s.getInputStream();
 			os = s.getOutputStream();
-			
+
 			while (!interrupted()) {
-				if (monitor.hasNewImage()) {
-					//System.out.println("ServerSocket: writing data...");
-					byte[] imageData = monitor.getImageData();
-					//System.out.println("image data length:" + imageData.length);
-					write(imageData, imageData.length);
-				}
+				byte[] imageData = monitor.getImageData();
+				write(imageData, imageData.length);
 			}
 		} catch (Throwable e) {
-			
+
 		}
 	}
 
@@ -54,11 +49,11 @@ public class ServerSocketConnection extends Thread {
 	}
 
 	// Writes data to the Output Stream
-	public void write(byte[] data, int length) throws IOException {
+	private void write(byte[] data, int length) throws IOException {
 		os.write(data, 0, length);
 		os.flush();
 	}
-	
+
 	public void close() throws IOException {
 		os.flush();
 		os.close();

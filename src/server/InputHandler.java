@@ -21,14 +21,10 @@ public class InputHandler extends Thread {
 				// Get the command
 				byte bCmd = data[0];
 				CMD cmd = Helper.byteToCmd(bCmd);
-				System.out.println("read cmd: " + cmd);
-				if (cmd == CMD.MOVIE || cmd == CMD.IDLE) {
-					monitor.setMode(cmd);
-				} else {
-					monitor.setSyncMode(cmd);
-				}
+//				System.out.println("read cmd: " + cmd);
+				monitor.changeMode(cmd);
 			} catch (Exception e) {
-				//e.printStackTrace();
+				e.printStackTrace();
 				//System.out.println("Exception in input handler");
 			}
 			
