@@ -1,6 +1,7 @@
 package client;
 
 import util.Command.CMD;
+import util.Constants;
 import util.ImageFrame;
 
 public class ClientMonitor {
@@ -9,6 +10,7 @@ public class ClientMonitor {
 	private CMD mode;
 	private CMD syncMode;
 	private CMD autoMode;
+	private boolean idleWait = false;
 	private boolean motion = false;
 	private boolean autoChanged = false;
 	private boolean modeChanged = false;
@@ -23,8 +25,7 @@ public class ClientMonitor {
 
 	public synchronized ImageFrame getImage() {
 		ImageFrame temp = null;
-		while (!buff.hasImage()) {
-			
+		while (buff.isEmpty()) {
 			try {
 				wait();
 			} catch (InterruptedException e) {
@@ -51,12 +52,8 @@ public class ClientMonitor {
 	public synchronized void setImage(byte[] image) {
 		lastImage = ImageBuilder.build(image);
 		motion = (lastImage.getMode() == CMD.MOTION);
-		while (buff.isFull()) {
-			try {
-				wait();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+		if (autoMode == CMD.AUTO && motion) {
+			mode = CMD.MOVIE;
 		}
 		buff.put(lastImage);
 		notifyAll();
@@ -65,25 +62,18 @@ public class ClientMonitor {
 	public synchronized void setMode(CMD cmd) {
 		if (mode != cmd) {
 			mode = cmd;
-			modeChanged = true;
 			notifyAll();
 		}
 	}
 
 	public synchronized void setSyncMode(CMD cmd) {
-		if (syncMode != cmd) {
-			syncMode = cmd;
-			syncModeChanged = true;
-			notifyAll();
-		}
+		syncMode = cmd;
+		// notifyAll();
 	}
 
 	public synchronized void setAutoMode(CMD cmd) {
-		if (autoMode != cmd) {
-			autoMode = cmd;
-			autoChanged = true;
-			notifyAll();
-		}
+		autoMode = cmd;
+		// notifyAll();
 	}
 
 	public synchronized boolean motionDetected() {
@@ -115,4 +105,17 @@ public class ClientMonitor {
 		modeChanged = false;
 		return true;
 	}
+
+	public synchronized void setThreadToWait() {
+		long startTime = System.currentTimeMillis();
+		while (System.currentTimeMillis() - startTime < Constants.IDLE_WAIT_PERIOD && mode == CMD.IDLE) {
+			try {
+				wait(Constants.IDLE_WAIT_PERIOD);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		notifyAll();
+	}
+
 }

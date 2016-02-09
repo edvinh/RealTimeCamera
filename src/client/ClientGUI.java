@@ -84,6 +84,7 @@ public class ClientGUI extends JFrame {
 
 			public void itemStateChanged(ItemEvent e) {
 				if (e.getStateChange() == ItemEvent.SELECTED) {
+					System.out.println("idle knapp");
 					monitors[0].setMode(CMD.IDLE);
 					monitors[1].setMode(CMD.IDLE);
 					createNotification(CMD.IDLE + " entered");
@@ -151,24 +152,26 @@ public class ClientGUI extends JFrame {
 					idle.setEnabled(false);
 					movie.setEnabled(false);
 					createNotification(CMD.AUTO + " entered");
-					monitors[0].setMode(CMD.IDLE);
-					monitors[0].setSyncMode(CMD.AUTO);
-					monitors[1].setMode(CMD.IDLE);
-					monitors[1].setSyncMode(CMD.AUTO);
+					monitors[0].setAutoMode(CMD.AUTO);
+					monitors[1].setAutoMode(CMD.AUTO);
 				} else {
-
-					idle.doClick();
-					sync.doClick();
-					monitors[0].setSyncMode(CMD.SYNC);
-					monitors[0].setMode(CMD.IDLE);
-					monitors[1].setSyncMode(CMD.SYNC);
-					monitors[1].setMode(CMD.IDLE);
-					idle.setSelected(true);
 					sync.setEnabled(true);
 					async.setEnabled(true);
 					idle.setEnabled(true);
 					movie.setEnabled(true);
 					createNotification(CMD.AUTO + " exited");
+					monitors[0].setAutoMode(CMD.MANUAL);
+					monitors[1].setAutoMode(CMD.MANUAL);
+					if (monitors[0].getMode() == CMD.IDLE && monitors[1].getMode() == CMD.IDLE) {
+						idle.setSelected(true);
+					} else {
+						idle.setSelected(false);
+					}
+					if (monitors[0].getSyncMode() == CMD.SYNC && monitors[1].getSyncMode() == CMD.SYNC) {
+						sync.setSelected(true);
+					} else {
+						sync.setSelected(false);
+					}
 				}
 			}
 		});

@@ -12,7 +12,6 @@ public class Client {
 	
 	private ClientMonitor monitor1, monitor2;
 	private ClientSocketConnection socket1, socket2;
-	private ClientOutput clientOutput1, clientOutput2;
 	private ClientGUI gui;
 	
 	
@@ -31,8 +30,8 @@ public class Client {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		clientOutput1 = new ClientOutput(socket1, monitor1);
-		clientOutput2 = new ClientOutput(socket2, monitor2);
+//		clientOutput1 = new ClientOutput(socket1, monitor1);
+//		clientOutput2 = new ClientOutput(socket2, monitor2);
 	}
 	
 	/**
@@ -40,9 +39,9 @@ public class Client {
 	 */
 	public void start() {
 		socket1.start();
-		clientOutput1.start();
+//		clientOutput1.start();
 		socket2.start();
-		clientOutput2.start();
+//		clientOutput2.start();
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				gui = new ClientGUI(monitor1, monitor2, 2);

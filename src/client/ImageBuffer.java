@@ -1,38 +1,31 @@
 package client;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 
 import util.ImageFrame;
 
 public class ImageBuffer {
 	public final static int MAX_BUFFER_SIZE = 10;
-	private ArrayList<ImageFrame> queue;
+	private LinkedList<ImageFrame> q;
 
 	public ImageBuffer() {
-		queue = new ArrayList<ImageFrame>();
+		q = new LinkedList<ImageFrame>();
 	}
 
 	public void put(ImageFrame image) {
-		queue.add(image);
-	}
-	
-	public boolean isFull() {
-		return queue.size() >= 10;
-	}
-
-	public ImageFrame pop() {
-		if (queue.size() > 0) {
-			return queue.remove(0);
+		if (q.size() >= MAX_BUFFER_SIZE) {
+			q.remove();
+			q.add(image);
 		} else {
-			return null;
+			q.add(image);
 		}
 	}
 
-	public boolean hasImage() {
-		return queue.size() > 0;
+	public ImageFrame pop() {
+		return q.pop();
 	}
 
-	public int size() {
-		return queue.size();
+	public boolean isEmpty() {
+		return q.size() == 0;
 	}
 }
